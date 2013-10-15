@@ -41,7 +41,8 @@ public:
 			std::auto_ptr<reco::GsfTrackExtraCollection>&,
 			std::auto_ptr<std::vector<Trajectory> >&,
 			AlgoProductCollection&,
-			const reco::BeamSpot&);
+			const reco::BeamSpot&,
+      edm::Handle<reco::TrackCollection>&);  // for matching (AA)
 
 
 protected:

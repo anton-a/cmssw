@@ -20,8 +20,10 @@ GsfTrackProducer::GsfTrackProducer(const edm::ParameterSet& iConfig):
 		       iConfig.getParameter<bool>("useHitsSplitting")),
   theAlgo(iConfig)
 {
+  ckfTracks_ = consumes<reco::TrackCollection>(iConfig.getParameter< edm::InputTag >("ckfTracks")); // for kf-gsf matching (AA)
+
   setConf(iConfig);
-  setSrc( consumes<TrackCandidateCollection>(iConfig.getParameter<edm::InputTag>( "src" )), 
+  setSrc( consumes<TrackCandidateCollection>(iConfig.getParameter<edm::InputTag>( "src" )),
           consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>( "beamSpot" )));
   setAlias( iConfig.getParameter<std::string>( "@module_label" ) );
 //   string a = alias_;
@@ -68,7 +70,6 @@ void GsfTrackProducer::produce(edm::Event& theEvent, const edm::EventSetup& setu
   try{  
     edm::Handle<TrackCandidateCollection> theTCCollection;
     getFromEvt(theEvent,theTCCollection,bs);
-    
     //
     //run the algorithm  
     //
@@ -76,10 +77,22 @@ void GsfTrackProducer::produce(edm::Event& theEvent, const edm::EventSetup& setu
     theAlgo.runWithCandidate(theG.product(), theMF.product(), *theTCCollection, 
 			     theFitter.product(), thePropagator.product(), theBuilder.product(), bs, algoResults);
   } catch (cms::Exception &e){ edm::LogInfo("GsfTrackProducer") << "cms::Exception caught!!!" << "\n" << e << "\n"; throw; }
+  
+  
+  edm::Handle<reco::TrackCollection> kfTrackCollection;
+  try {
+    theEvent.getByToken(ckfTracks_, kfTrackCollection);
+    LogDebug("GsfTrackProducer") << "Get the kf tracks\n"; 
+  }
+  catch (cms::Exception &e) { edm::LogInfo("GsfTrackProducer") 
+    << "cms::Exception caught when retriving kf tracks\n" 
+    << e << "\n"; 
+    throw;
+  }
   //
   //put everything in the event
   putInEvt(theEvent, thePropagator.product(), theMeasTk.product(), outputRHColl, outputTColl, outputTEColl, outputGsfTEColl,
-	   outputTrajectoryColl, algoResults, bs);
+	   outputTrajectoryColl, algoResults, bs, kfTrackCollection);
   LogDebug("GsfTrackProducer") << "end" << "\n";
 }
 

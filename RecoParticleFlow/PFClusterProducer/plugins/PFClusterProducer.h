@@ -19,6 +19,9 @@
 
 #include "RecoParticleFlow/PFClusterProducer/interface/PFClusterAlgo.h"
 
+// for the modified PFCLuster (AA)
+#include "DataFormats/ParticleFlowReco/interface/PFRecHitFractionFwd.h"
+
 /**\class PFClusterProducer 
 \brief Producer for particle flow  clusters (PFCluster). 
 

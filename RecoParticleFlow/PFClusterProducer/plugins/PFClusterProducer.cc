@@ -149,6 +149,10 @@ PFClusterProducer::PFClusterProducer(const edm::ParameterSet& iConfig)
    produces<reco::PFRecHitCollection>("Cleaned");
 
     //---ab
+    
+   // save rechitfractions separately from cluster (AA)
+   produces<reco::PFRecHitFractionCollection>();
+
 }
 
 
@@ -188,9 +192,28 @@ void PFClusterProducer::produce(edm::Event& iEvent,
   
   // get clusters out of the clustering algorithm 
   // and put them in the event. There is no copy.
-  auto_ptr< vector<reco::PFCluster> > outClusters( clusterAlgo_.clusters() ); 
+  auto_ptr< vector<reco::PFCluster> > outClusters( clusterAlgo_.clusters() );
+  // the new collection (AA)
+  auto_ptr< vector<vector<reco::PFRecHitFraction> > > outRecHitFractions( new vector<vector<reco::PFRecHitFraction> > );  
   auto_ptr< vector<reco::PFRecHit> > recHitsCleaned ( clusterAlgo_.rechitsCleaned() ); 
-  iEvent.put( outClusters );    
+  
+  // get ref before put for the pfrechitfracs (AA)
+  reco::PFRecHitFractionRefProd pfRecHitsFracsRef = iEvent.getRefBeforePut<reco::PFRecHitFractionCollection>();
+  
+  // now set the new (external) fractions collection
+  // that will be saved in RECO, but dropped in AOD (AA)
+  
+   edm::Ref<reco::PFRecHitFractionCollection>::key_type idx = 0;
+   vector<reco::PFCluster>::iterator cl_it = outClusters->begin(); 
+   for (; cl_it != outClusters->end(); ++cl_it) {
+     reco::PFRecHitFractionRef rhfRef = reco::PFRecHitFractionRef(pfRecHitsFracsRef, idx++);
+     cl_it->setPFRecHitFractionsRef(rhfRef);
+     outRecHitFractions->push_back(cl_it->transientPFRecHitFractions());
+   }
+
+
+  iEvent.put( outClusters );
+  iEvent.put( outRecHitFractions ); // (AA) 
   iEvent.put( recHitsCleaned, "Cleaned" );    
 
 }

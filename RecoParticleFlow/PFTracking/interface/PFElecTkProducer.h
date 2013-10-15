@@ -16,11 +16,16 @@
 #include "DataFormats/ParticleFlowReco/interface/PFCluster.h"
 #include "DataFormats/ParticleFlowReco/interface/PFClusterFwd.h"
 
+// the new map of gsftracks to brem cconv tracks stored in the event (AA)
+#include "DataFormats/EgammaTrackReco/interface/GsfTrackToBremConvTracksMapFwd.h"
+
 class PFTrackTransformer;
 class GsfTrack;
 class MagneticField;
 class TrackerGeometry;
-class ConvBremPFTrackFinder;
+class CaloGeometry;
+// not needed when we save gsf- conv map (AA)
+//class ConvBremPFTrackFinder;
 
 /// \brief Abstract
 /*!
@@ -41,6 +46,8 @@ class PFElecTkProducer : public edm::EDProducer {
      ///Destructor
      ~PFElecTkProducer();
 
+	  void setCaloGeometry( const CaloGeometry* geo) { caloGeometry_ = geo; }
+
    private:
       virtual void beginRun(const edm::Run&,const edm::EventSetup&) override;
       virtual void endRun(const edm::Run&,const edm::EventSetup&) override;
@@ -49,10 +56,18 @@ class PFElecTkProducer : public edm::EDProducer {
       virtual void produce(edm::Event&, const edm::EventSetup&) override;
 
     
-      int FindPfRef(const reco::PFRecTrackCollection & PfRTkColl, 
-		    const reco::GsfTrack&, bool);
+//      int FindPfRef(const reco::PFRecTrackCollection & PfRTkColl, 
+//        reco::GsfTrack, bool);
+
+      /// get the index of the PFRecTrack corresponding to tkRef (AA)  
+      int FindPfTkIndex(const reco::PFRecTrackCollection & PfRTkColl, 
+        reco::TrackRef & tkRef);
+        
+        
+        
       
-      bool isFifthStep(reco::PFRecTrackRef pfKfTrack);
+//      bool isFifthStep(reco::PFRecTrackRef pfKfTrack);
+      bool isFifthStep(reco::TrackRef kfTrack);  // for modified gsfExtra (AA)
 
       bool applySelection(const reco::GsfTrack&);
       
@@ -91,7 +106,17 @@ class PFElecTkProducer : public edm::EDProducer {
       void createGsfPFRecTrackRef(const edm::OrphanHandle<reco::GsfPFRecTrackCollection>& gsfPfHandle,
 				  std::vector<reco::GsfPFRecTrack>& gsfPFRecTrackPrimary,
 				  const std::map<unsigned int, std::vector<reco::GsfPFRecTrack> >& MapPrimSec);
-	
+      
+      // helper: convert a vector of TrackRefs to a vector PFRecTrackRefs (AA)
+ //     const std::vector<reco::PFRecTrackRef> trkRefVecToPFTrkRefVec(const std::vector<reco::TrackRef>& convTrkRefVector);
+        
+        // without quality
+//        const std::vector<reco::PFRecTrackRef> trkRefVecToPFTrkRefVec(const edm::RefVector<std::vector<reco::Track> >& convTrkRefVector,
+//                     edm::Handle<reco::PFRecTrackCollection>& thePfRecTrackCollection);
+        const std::vector<reco::PFRecTrackRef> trkRefVecToPFTrkRefVec(const std::vector<std::pair<reco::TrackRef, float> >& convTrkRefVector,
+                                                                      edm::Handle<reco::PFRecTrackCollection>& thePfRecTrackCollection);
+      
+          
       // ----------member data ---------------------------
       reco::GsfPFRecTrack pftrack_;
       reco::GsfPFRecTrack secpftrack_;
@@ -103,6 +128,9 @@ class PFElecTkProducer : public edm::EDProducer {
       edm::InputTag pfNuclear_;
       edm::InputTag pfConv_;
       edm::InputTag pfV0_;
+// for the new map (AA)
+      edm::InputTag gsfTrackToBremConvTracksMapTag_;
+      
       bool useNuclear_;
       bool useConversions_;
       bool useV0_;
@@ -114,7 +142,8 @@ class PFElecTkProducer : public edm::EDProducer {
       PFTrackTransformer *pfTransformer_;     
       const MultiTrajectoryStateMode *mtsMode_;
       MultiTrajectoryStateTransform  mtsTransform_;
-      ConvBremPFTrackFinder *convBremFinder_;
+// not needed when we save gsf- conv map (AA)
+//      ConvBremPFTrackFinder *convBremFinder_;
 
 
       ///Trajectory of GSfTracks in the event?
@@ -130,11 +159,20 @@ class PFElecTkProducer : public edm::EDProducer {
       double SCEne_;
       double detaGsfSC_;
       double dphiGsfSC_;
-      double maxPtConvReco_;
-      
+      double maxPtConvReco_; // does not seem to be used anywhere (AA)
+
+// not needed when we save gsf- conv map (AA)
+/*
       /// Conv Brem Finder
       bool useConvBremFinder_;
       double mvaConvBremFinderID_;
       std::string path_mvaWeightFileConvBrem_;
+*/
+		// needed for linking by DetID when running on AOD files (AA)
+		const CaloGeometry* caloGeometry_;
+
+		// switch for AOD inputs (AA)
+		bool runOnAOD_;
+
 };
 #endif

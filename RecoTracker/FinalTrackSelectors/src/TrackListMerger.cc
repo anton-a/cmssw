@@ -642,8 +642,8 @@ namespace cms
 	
 	// Fill TrackExtra collection
 	outputTrkExtras->push_back( reco::TrackExtra( 
-						     track->outerPosition(), track->outerMomentum(), track->outerOk(),
-						     track->innerPosition(), track->innerMomentum(), track->innerOk(),
+						     track->outerOk(),
+						     track->innerOk(),
 						     track->outerStateCovariance(), track->outerDetId(),
 						     track->innerStateCovariance(), track->innerDetId(),
 						     track->seedDirection(), origSeedRef ) );

@@ -61,6 +61,13 @@
 #include "DataFormats/ParticleFlowReco/interface/RecoPFClusterRefCandidate.h"
 #include "DataFormats/ParticleFlowReco/interface/RecoPFClusterRefCandidateFwd.h"
 
+
+// check if these should go to _ or here (AA)
+#include "DataFormats/ParticleFlowReco/interface/PFRecHitFraction.h"
+#include "DataFormats/ParticleFlowReco/interface/PFRecHitFractionFwd.h"
+
+
+
 #include <map>
 
 namespace {
@@ -193,6 +200,21 @@ namespace {
     edm::RefVector<std::vector<reco::PFBlock>, reco::PFBlock, edm::refhelper::FindUsingAdvance< std::vector<reco::PFBlock>, reco::PFBlock> > dummy336;
 
 edm::Wrapper<edm::RefVector<std::vector<reco::RecoPFClusterRefCandidate>,reco::RecoPFClusterRefCandidate,edm::refhelper::FindUsingAdvance<std::vector<reco::RecoPFClusterRefCandidate>,reco::RecoPFClusterRefCandidate> > > tpaaapfc2;
+
+
+
+// for the split PFrecHitFraction collection (AA)
+
+    std::vector<reco::PFRecHitFraction> dummy7100;
+    edm::Wrapper<std::vector<reco::PFRecHitFraction> > dummy7101;
+    edm::Ref<std::vector<reco::PFRecHitFraction>, reco::PFRecHitFraction, edm::refhelper::FindUsingAdvance<std::vector<reco::PFRecHitFraction>, reco::PFRecHitFraction> > dummy7102;
+    edm::RefProd<std::vector<reco::PFRecHitFraction> > dummy7103;
+    edm::RefVector<std::vector<reco::PFRecHitFraction>, reco::PFRecHitFraction, edm::refhelper::FindUsingAdvance<std::vector<reco::PFRecHitFraction>, reco::PFRecHitFraction> > dummy7104;
+    reco::PFRecHitFractionCollection dummy7000;
+    edm::Wrapper<reco::PFRecHitFractionCollection> dummy7001;
+    edm::Ref<reco::PFRecHitFractionCollection, std::vector<reco::PFRecHitFraction>, edm::refhelper::FindUsingAdvance<reco::PFRecHitFractionCollection, std::vector<reco::PFRecHitFraction> >  > dummy7002;
+    edm::RefProd<reco::PFRecHitFractionCollection> dummy7003;
+    edm::RefVector<reco::PFRecHitFractionCollection, std::vector<reco::PFRecHitFraction>, edm::refhelper::FindUsingAdvance<reco::PFRecHitFractionCollection, std::vector<reco::PFRecHitFraction> >  > dummy7004;
 
 
   };

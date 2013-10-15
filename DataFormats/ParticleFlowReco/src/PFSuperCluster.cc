@@ -34,8 +34,9 @@ std::ostream& reco::operator<<(std::ostream& out,
 
   const math::XYZPoint&  pos = cluster.position();
   const PFCluster::REPPoint&  posrep = cluster.positionREP();
-  const std::vector< reco::PFRecHitFraction >& fracs =
-    cluster.recHitFractions();
+  // changed for the modified PFCluster (AA)
+  const std::vector<reco::PFRecHitFraction>& fracs = *cluster.recHitFractions();
+
 
   out<<"PFSuperCluster "
      <<", clusters: "<<cluster.clusters().size()

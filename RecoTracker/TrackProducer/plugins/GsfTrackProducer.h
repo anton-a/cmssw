@@ -6,8 +6,10 @@
 
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
 #include "DataFormats/GsfTrackReco/interface/GsfComponent5D.h"
-#include "DataFormats/GsfTrackReco/interface/GsfTrackFwd.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/GsfTrackReco/interface/GsfTrackExtraFwd.h"
+
+#include "FWCore/Utilities/interface/EDGetToken.h"
 
 class GsfTrackProducer : public GsfTrackProducerBase, public edm::EDProducer {
 public:
@@ -19,6 +21,9 @@ public:
 
 private:
   TrackProducerAlgorithm<reco::GsfTrack> theAlgo;
+
+  // for matching of kf to gsf tracks (AA)
+  edm::EDGetTokenT<reco::TrackCollection> ckfTracks_;
 
 };
 

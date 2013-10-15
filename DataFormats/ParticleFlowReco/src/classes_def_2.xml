@@ -1,8 +1,10 @@
 <lcgdict>
 <selection>
 
-  <class name="reco::PFCluster" ClassVersion="10">
+  <class name="reco::PFCluster" ClassVersion="11">
+   <version ClassVersion="11" checksum="203782937"/>
    <version ClassVersion="10" checksum="1793013291"/>
+    <field name="rechits_" transient="true"/>
     <field name="posrep_" transient="true"/>
     <field name="color_" transient="true"/>
   </class>
@@ -13,6 +15,19 @@
    <version ClassVersion="10" checksum="3960206"/>
   </class>
   <class name="std::vector<reco::PFRecHitFraction>"/>
+
+<!-- for the new collection of PFRecHitFraction (AA) -->
+  <class name="edm::Wrapper<std::vector<reco::PFRecHitFraction> >"/>
+  <class name="edm::RefProd<std::vector<reco::PFRecHitFraction> >"/>
+  <class name="edm::Ref<std::vector<reco::PFRecHitFraction>, reco::PFRecHitFraction, edm::refhelper::FindUsingAdvance<std::vector<reco::PFRecHitFraction>, reco::PFRecHitFraction> >" />
+  <class name="edm::RefVector<std::vector<reco::PFRecHitFraction>, reco::PFRecHitFraction, edm::refhelper::FindUsingAdvance<std::vector<reco::PFRecHitFraction>, reco::PFRecHitFraction> >" />
+
+  <class name="std::vector<std::vector<reco::PFRecHitFraction> >"/>
+  <class name="edm::Wrapper<std::vector<std::vector<reco::PFRecHitFraction> > >"/>
+  <class name="edm::RefProd<std::vector<std::vector<reco::PFRecHitFraction> > >" />
+  <class name="edm::Ref<std::vector<std::vector<reco::PFRecHitFraction> >, std::vector<reco::PFRecHitFraction>, edm::refhelper::FindUsingAdvance< std::vector<std::vector<reco::PFRecHitFraction> >, std::vector<reco::PFRecHitFraction> >  >"/>
+  <class name="edm::RefVector<std::vector<std::vector<reco::PFRecHitFraction> >, std::vector<reco::PFRecHitFraction>, edm::refhelper::FindUsingAdvance< std::vector<std::vector<reco::PFRecHitFraction> >, std::vector<reco::PFRecHitFraction> > >"/>
+
 
   <class name="reco::RecoPFClusterRefCandidateBase">
     <field name="p4Polar_" transient="true"/>

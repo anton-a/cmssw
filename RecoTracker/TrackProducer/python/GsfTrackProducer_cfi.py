@@ -12,7 +12,8 @@ gsfTrackProducer = cms.EDProducer("GsfTrackProducer",
     NavigationSchool = cms.string('SimpleNavigationSchool'),
     MeasurementTracker = cms.string(''),                   
     GeometricInnerState = cms.bool(False),
-    AlgorithmName = cms.string('gsf')
+    AlgorithmName = cms.string('gsf'),
+    ckfTracks = cms.InputTag("generalTracks")
 )
 
 

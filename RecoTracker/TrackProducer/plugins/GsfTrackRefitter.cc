@@ -17,6 +17,8 @@ GsfTrackRefitter::GsfTrackRefitter(const edm::ParameterSet& iConfig):
 		       iConfig.getParameter<bool>("useHitsSplitting")),
   theAlgo(iConfig)
 {
+  ckfTracks_ = consumes<reco::TrackCollection>(iConfig.getParameter< edm::InputTag >("ckfTracks")); // for kf-gsf matching (AA)
+
   setConf(iConfig);
   setSrc( consumes<reco::GsfTrackCollection>(iConfig.getParameter<edm::InputTag>( "src" )), 
           consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>( "beamSpot" )));
@@ -104,10 +106,22 @@ void GsfTrackRefitter::produce(edm::Event& theEvent, const edm::EventSetup& setu
     }
     //default... there cannot be any other possibility due to the check in the ctor
   }
-  
+
+  edm::Handle<reco::TrackCollection> ckfTrackCollection; // (AA)
+  try {
+    theEvent.getByToken(ckfTracks_, ckfTrackCollection);
+    LogDebug("GsfTrackProducer") << "Get the kf tracks\n";
+  }
+  catch (cms::Exception &e) { edm::LogInfo("GsfTrackProducer")
+    << "cms::Exception caught when retriving the kf tracks\n"
+    << e << "\n";
+    throw;
+  }
+
   //put everything in th event
   putInEvt(theEvent, thePropagator.product(), theMeasTk.product(),
-	   outputRHColl, outputTColl, outputTEColl, outputGsfTEColl, outputTrajectoryColl, algoResults, bs);
+	   outputRHColl, outputTColl, outputTEColl, outputGsfTEColl, outputTrajectoryColl, algoResults, bs,
+     ckfTrackCollection );
   LogDebug("GsfTrackRefitter") << "end" << "\n";
 }
 

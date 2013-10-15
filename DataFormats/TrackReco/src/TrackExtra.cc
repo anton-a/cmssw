@@ -2,16 +2,39 @@
 #include "DataFormats/TrackReco/interface/fillCovariance.h"
 using namespace reco;
 
+/*
 TrackExtra::TrackExtra( const Point & outerPosition, const Vector & outerMomentum, bool ok ,
-			const Point & innerPosition, const Vector & innerMomentum, bool iok,
+      const Point & innerPosition, const Vector & innerMomentum, bool iok,
+      const CovarianceMatrix& outerCov, unsigned int outerId,
+      const CovarianceMatrix& innerCov, unsigned int innerId,
+      PropagationDirection seedDir,
+      edm::RefToBase<TrajectorySeed>  seedRef):    
+  TrackExtraBase(),
+  outerPosition_( outerPosition ), outerMomentum_( outerMomentum ), outerOk_( ok ), 
+  outerDetId_( outerId ),
+  innerPosition_( innerPosition ), innerMomentum_( innerMomentum ), innerOk_( iok ),
+  innerDetId_( innerId ), seedDir_(seedDir), seedRef_(seedRef) {
+  index idx = 0;
+  for( index i = 0; i < dimension; ++ i ) {
+    for( index j = 0; j <= i; ++ j ) {
+      outerCovariance_[ idx ] = outerCov( i, j );
+      innerCovariance_[ idx ] = innerCov( i, j );
+      ++idx;
+    }
+  }
+}
+*/
+// skip the moved members (AA)
+TrackExtra::TrackExtra( bool ok ,
+			bool iok,
 			const CovarianceMatrix& outerCov, unsigned int outerId,
 			const CovarianceMatrix& innerCov, unsigned int innerId,
 			PropagationDirection seedDir,
 			edm::RefToBase<TrajectorySeed>  seedRef):    
   TrackExtraBase(),
-  outerPosition_( outerPosition ), outerMomentum_( outerMomentum ), outerOk_( ok ), 
+  outerOk_( ok ), 
   outerDetId_( outerId ),
-  innerPosition_( innerPosition ), innerMomentum_( innerMomentum ), innerOk_( iok ),
+  innerOk_( iok ),
   innerDetId_( innerId ), seedDir_(seedDir), seedRef_(seedRef) {
   index idx = 0;
   for( index i = 0; i < dimension; ++ i ) {

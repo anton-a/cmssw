@@ -663,11 +663,14 @@ TrackCandidateProducer::produce(edm::Event& e, const edm::EventSetup& es) {
   for ( unsigned index = 0; index < nTracks; ++index ) { 
     //reco::TrackExtra aTrackExtra;
     reco::Track& aTrack = recoTracks->at(index);
-    reco::TrackExtra aTrackExtra(aTrack.outerPosition(),
-				 aTrack.outerMomentum(),
+    
+    // Use the reduced extra format (AA)
+    reco::TrackExtra aTrackExtra(
+//    aTrack.outerPosition(),
+//				 aTrack.outerMomentum(),
 				 aTrack.outerOk(),
-				 aTrack.innerPosition(),
-				 aTrack.innerMomentum(),
+//				 aTrack.innerPosition(),
+//				 aTrack.innerMomentum(),
 				 aTrack.innerOk(),
 				 aTrack.outerStateCovariance(),
 				 aTrack.outerDetId(),

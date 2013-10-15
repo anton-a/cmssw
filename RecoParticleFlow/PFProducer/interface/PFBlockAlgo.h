@@ -35,6 +35,11 @@
 #include "RecoParticleFlow/PFProducer/interface/KDTreeLinkerTrackHcal.h" 
 #include "RecoParticleFlow/PFProducer/interface/KDTreeLinkerPSEcal.h" 
 // !Glowinski & Gouzevitch
+#include "RecoParticleFlow/PFProducer/interface/KDTreeLinkerTrackEcalAOD.h" 
+#include "RecoParticleFlow/PFProducer/interface/KDTreeLinkerTrackHcalAOD.h" 
+#include "RecoParticleFlow/PFProducer/interface/KDTreeLinkerPSEcalAOD.h" 
+
+
 
 // #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 
@@ -58,6 +63,9 @@
 #include "RecoParticleFlow/PFClusterTools/interface/ClusterClusterMapping.h"
 
 #include "RecoParticleFlow/PFProducer/interface/PFBlockLink.h"
+
+// needed for cluster/track linking when using DetId's(AA)
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 
 #include <map>
 
@@ -83,8 +91,7 @@ class PFBlockAlgo {
 		      bool useIterTracking,
 		      int nuclearInteractionsPurity,
 		      bool useEGPhotons,
-		      std::vector<double> & photonSelectionCuts,
-		      bool useSuperClusters
+		      std::vector<double> & photonSelectionCuts
 		      );
   
   // Glowinski & Gouzevitch
@@ -110,8 +117,6 @@ class PFBlockAlgo {
 		   const T<reco::PFClusterCollection>&  hfhadh,
 		   const T<reco::PFClusterCollection>&  psh,
 		   const T<reco::PhotonCollection>&  egphh,
-		   const T<reco::SuperClusterCollection>&  sceb,
-		   const T<reco::SuperClusterCollection>&  scee,		   
 		   const Mask& trackMask = dummyMask_,
 		   const Mask& gsftrackMask = dummyMask_,
 		   const Mask& ecalMask = dummyMask_,
@@ -120,8 +125,7 @@ class PFBlockAlgo {
 		   const Mask& hfemMask = dummyMask_,		   
 		   const Mask& hfhadMask = dummyMask_,
 		   const Mask& psMask = dummyMask_,
-		   const Mask& phMask = dummyMask_,
-		   const Mask& scMask = dummyMask_);
+		   const Mask& phMask = dummyMask_);
   
   ///COLIN: I think this is for particle flow at HLT...
   template< template<typename> class T >
@@ -146,10 +150,8 @@ class PFBlockAlgo {
     T<reco::PFConversionCollection> convh;
     T<reco::PFV0Collection> v0;
     T<reco::PhotonCollection> phh;
-    T<reco::SuperClusterCollection> scebh;
-    T<reco::SuperClusterCollection> sceeh;    
     setInput<T>( trackh, gsftrackh, convbremgsftrackh, muonh, nuclearh, nucleartrackh, convh, v0, 
-		 ecalh, hcalh, hoh, hfemh, hfhadh, psh, phh, scebh, sceeh,
+		 ecalh, hcalh, hoh, hfemh, hfhadh, psh, phh,
 		 trackMask, ecalMask, hcalMask, hoMask, psMask); 
   }
   
@@ -200,6 +202,9 @@ class PFBlockAlgo {
   typedef reco::PFBlockCollection::const_iterator IBC;
   
   void setHOTag(bool ho) { useHO_ = ho;}
+
+  // set the geometry for linking using DetId'd (AA)
+  void setCaloGeometry(const CaloGeometry* caloGeo) { caloGeometryForLinking_ = caloGeo; }
 
  private:
   
@@ -275,8 +280,6 @@ class PFBlockAlgo {
 		      const reco::PFClusterCollection&  hfhads,
 		      const reco::PFClusterCollection&  pss, 
 		      const reco::PhotonCollection&  egphh, 
-		      const reco::SuperClusterCollection&  sceb, 
-		      const reco::SuperClusterCollection&  scee, 		      
 		      const Mask& trackMask,
 		      const Mask& gsftrackMask, 
 		      const Mask& ecalMask, 
@@ -285,8 +288,7 @@ class PFBlockAlgo {
 		      const Mask& hfemMask,
 		      const Mask& hfhadMask,		      
 		      const Mask& psMask,
-		      const Mask& phMask,
-		      const Mask& scMask) const;
+		      const Mask& phMask) const;
 
   /// open a resolution map
   // PFResolutionMap* openResolutionMap(const char* resMapName);
@@ -315,10 +317,19 @@ class PFBlockAlgo {
 
   // Glowinski & Gouzevitch
   bool useKDTreeTrackEcalLinker_;
+
+  // !Glowinski & Gouzevitch
   KDTreeLinkerTrackEcal TELinker_;
   KDTreeLinkerTrackHcal THLinker_;
   KDTreeLinkerPSEcal	PSELinker_;
-  // !Glowinski & Gouzevitch
+
+  // Add versions for running on AOD (AA)
+  KDTreeLinkerTrackEcalAOD TELinkerAOD_;
+  KDTreeLinkerTrackHcalAOD THLinkerAOD_;
+  KDTreeLinkerPSEcalAOD	PSELinkerAOD_;
+
+
+
 
   static const Mask                      dummyMask_;
 
@@ -333,9 +344,6 @@ class PFBlockAlgo {
 
   /// Flag to turn off the import of EG Photons
   bool useEGPhotons_;
-  
-  /// Flag to turn off the import of SuperCluster collections
-  bool useSuperClusters_;
 
   // This parameters defines the level of purity of
   // nuclear interactions choosen.
@@ -371,7 +379,15 @@ class PFBlockAlgo {
   // Create links between tracks or HCAL clusters, and HO clusters
   bool useHO_;
 
+  /// The caloGeometryForLinking_ pointer is set in the PFBlockProducer 
+  /// A check in PFBlockAlgo is performed:
+  ///  - If caloGeometryForLinking_==0, the cluster/track linking is performed 
+  ///    using calorimeter cell coordinates stored in the PFRecHits
+  ///  - Else, methods using cell geometry and detId's are deployed (used for re-reco from AOD)
+  const CaloGeometry* caloGeometryForLinking_;
+
 };
+
 
 #include "DataFormats/ParticleFlowReco/interface/PFBlockElementGsfTrack.h"
 #include "DataFormats/ParticleFlowReco/interface/PFBlockElementBrem.h"
@@ -396,8 +412,6 @@ PFBlockAlgo::setInput(const T<reco::PFRecTrackCollection>&    trackh,
                       const T<reco::PFClusterCollection>&  hfhadh,
                       const T<reco::PFClusterCollection>&  psh,
 		      const T<reco::PhotonCollection>& egphh,
-		      const T<reco::SuperClusterCollection>&  sceb,
-		      const T<reco::SuperClusterCollection>&  scee,		      
                       const Mask& trackMask,
 		      const Mask& gsftrackMask,
                       const Mask& ecalMask,
@@ -406,8 +420,7 @@ PFBlockAlgo::setInput(const T<reco::PFRecTrackCollection>&    trackh,
                       const Mask& hfemMask,
                       const Mask& hfhadMask,
                       const Mask& psMask,
-		      const Mask& phMask,
-		      const Mask& scMask) {
+		      const Mask& phMask) {
 
 
   checkMaskSize( *trackh,
@@ -419,8 +432,6 @@ PFBlockAlgo::setInput(const T<reco::PFRecTrackCollection>&    trackh,
 		 *hfhadh,
                  *psh,
 		 *egphh,
-		 *sceb,
-		 *scee,		 
                  trackMask,
 		 gsftrackMask,
                  ecalMask,
@@ -429,8 +440,7 @@ PFBlockAlgo::setInput(const T<reco::PFRecTrackCollection>&    trackh,
 		 hfemMask,
 		 hfhadMask,
                  psMask,
-		 phMask,
-		 scMask);
+		 phMask);
 
   /*
   if (nucleartrackh.isValid()){
@@ -591,59 +601,6 @@ PFBlockAlgo::setInput(const T<reco::PFRecTrackCollection>&    trackh,
 	}
     }
   }
-  
-  /// Loop over the SuperClusters
-  if(useSuperClusters_ && sceb.isValid() && scee.isValid()) {
-    std::vector<reco::SuperClusterRef> screfs;
-    screfs.reserve(sceb->size()+scee->size());
-    
-    for (unsigned int isc=0; isc<sceb->size(); ++isc) {
-      reco::SuperClusterRef scRef(sceb,isc);
-      screfs.push_back(scRef);
-    }
-
-    for (unsigned int isc=0; isc<scee->size(); ++isc) {
-      reco::SuperClusterRef scRef(scee,isc);
-      screfs.push_back(scRef);
-    }    
-    
-    unsigned size=screfs.size();
-    for(unsigned isc=0; isc<size; ++isc) {
-      if(!scMask.empty() && !(scMask)[isc] ) continue;
-      //if(!photonSelector_->passPhotonSelection((*egphh)[isc])) continue;
-      
-      //      std::cout << " Selected a supercluster" << std::endl;
-      // Add only the super clusters not already included 
-      reco::SuperClusterRef &scRef = screfs[isc];
-      std::vector<reco::SuperClusterRef>::iterator itcheck=find(superClusters_.begin(),superClusters_.end(),scRef);
-      if(itcheck==superClusters_.end())
-	{
-	  superClusters_.push_back(scRef);
-	  reco::PFBlockElementSuperCluster * sce =
-	    new reco::PFBlockElementSuperCluster(scRef);
-	  //fillFromPhoton(egphh,isc,sce);
-	  //sce->setFromPhoton(true);
-	  elements_.push_back(sce);
-	}
-//       else
-// 	{
-// 	  PFBlockElementSCEqual myEqual(scRef);
-// 	  std::list<reco::PFBlockElement*>::iterator itcheck=find_if(elements_.begin(),elements_.end(),myEqual);
-// 	  if(itcheck!=elements_.end())
-// 	    {
-// 	      reco::PFBlockElementSuperCluster* thePFBE=dynamic_cast<reco::PFBlockElementSuperCluster*>(*itcheck);
-// 	      //fillFromPhoton(egphh,isc,thePFBE);
-// 	      //thePFBE->setFromPhoton(true);
-// 	      //	      std::cout << " Updating element to add Photon information " << photonSelector_->passPhotonSelection((*egphh)[isc]) << std::endl;
-// 
-// 	    }
-// //	  else
-// //	    {
-// //	      std::cout << " Missing element " << std::endl;
-// //	    }
-// 	}
-    }
-  }  
   
   // set the vector to the right size so to allow random access
   scpfcRefs_.resize(superClusters_.size());
@@ -1161,9 +1118,10 @@ PFBlockAlgo::setInput(const T<reco::PFRecTrackCollection>&    trackh,
     case reco::PFBlockElement::TRACK:
       if (useKDTreeTrackEcalLinker_) {
 	if ( (*it)->trackRefPF()->extrapolatedPoint( reco::PFTrajectoryPoint::ECALShowerMax ).isValid() )
-	  TELinker_.insertTargetElt(*it);
+	  caloGeometryForLinking_? TELinkerAOD_.insertTargetElt(*it) : TELinker_.insertTargetElt(*it);
+	
 	if ( (*it)->trackRefPF()->extrapolatedPoint( reco::PFTrajectoryPoint::HCALEntrance ).isValid() )
-	  THLinker_.insertTargetElt(*it);
+	  caloGeometryForLinking_? THLinkerAOD_.insertTargetElt(*it) : THLinker_.insertTargetElt(*it);
       }
       
       break;
@@ -1171,25 +1129,31 @@ PFBlockAlgo::setInput(const T<reco::PFRecTrackCollection>&    trackh,
     case reco::PFBlockElement::PS1:
     case reco::PFBlockElement::PS2:
       if (useKDTreeTrackEcalLinker_)
-	PSELinker_.insertTargetElt(*it);
+			caloGeometryForLinking_? PSELinkerAOD_.insertTargetElt(*it) : PSELinker_.insertTargetElt(*it);
       break;
 
     case reco::PFBlockElement::HCAL:
       if (useKDTreeTrackEcalLinker_)
-	THLinker_.insertFieldClusterElt(*it);
+			caloGeometryForLinking_? THLinkerAOD_.insertFieldClusterElt(*it) : THLinker_.insertFieldClusterElt(*it);
       break;
 
     case reco::PFBlockElement::HO: 
       if (useHO_ && useKDTreeTrackEcalLinker_) {
-	// THLinker_.insertFieldClusterElt(*it);
+	// caloGeometryForLinking_? THLinkerAOD_.insertFieldClusterElt(*it) : THLinker_.insertFieldClusterElt(*it);
       }
       break;
 
 	
     case reco::PFBlockElement::ECAL:
       if (useKDTreeTrackEcalLinker_) {
-	TELinker_.insertFieldClusterElt(*it);
-	PSELinker_.insertFieldClusterElt(*it);
+			if (caloGeometryForLinking_) {
+				TELinkerAOD_.insertFieldClusterElt(*it);
+				PSELinkerAOD_.insertFieldClusterElt(*it);
+			}
+			else {
+				TELinker_.insertFieldClusterElt(*it);
+				PSELinker_.insertFieldClusterElt(*it);
+			}
       }
       break;
 

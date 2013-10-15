@@ -14,4 +14,24 @@
    <class name="reco::ConversionTrackCollection" />
    <class name="edm::Wrapper<reco::ConversionTrackCollection>" />   
 
-</lcgdict>                                                                                                                                                        
+   <class name="edm::helpers::KeyVal<edm::RefProd<std::vector<reco::GsfTrack> >,edm::RefProd<std::vector<reco::Track> > >" />  
+   <class name="edm::helpers::KeyVal<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >,std::vector<std::pair<edm::Ref<std::vector<reco::Track>,reco::Track,edm::refhelper::FindUsingAdvance<std::vector<reco::Track>,reco::Track> >,float> > >" />
+   <class name="std::map<unsigned int,edm::helpers::KeyVal<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >,std::vector<std::pair<edm::Ref<std::vector<reco::Track>,reco::Track,edm::refhelper::FindUsingAdvance<std::vector<reco::Track>,reco::Track> >,float> > > > " />             
+   <class name="edm::AssociationMap<edm::OneToManyWithQuality<std::vector<reco::GsfTrack>,std::vector<reco::Track>,float,unsigned int> >" />
+   <class name="edm::Wrapper<edm::AssociationMap<edm::OneToManyWithQuality<std::vector<reco::GsfTrack>,std::vector<reco::Track>,float,unsigned int> > >" />
+   <class name="edm::helpers::KeyVal<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >,std::vector<std::pair<edm::Ref<std::vector<reco::Track>,reco::Track,edm::refhelper::FindUsingAdvance<std::vector<reco::Track>,reco::Track> >,int> > >" />
+   <class name="std::map<unsigned int,edm::helpers::KeyVal<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >,std::vector<std::pair<edm::Ref<std::vector<reco::Track>,reco::Track,edm::refhelper::FindUsingAdvance<std::vector<reco::Track>,reco::Track> >,int> > > > " />               
+   <class name="edm::AssociationMap<edm::OneToManyWithQuality<std::vector<reco::GsfTrack>,std::vector<reco::Track>,int,unsigned int> >" />                                         
+   <class name="edm::Wrapper<edm::AssociationMap<edm::OneToManyWithQuality<std::vector<reco::GsfTrack>,std::vector<reco::Track>,int,unsigned int> > >" />
+ 
+   <class name="edm::helpers::KeyVal<edm::RefProd<std::vector<reco::Track> >,edm::RefProd<std::vector<reco::GsfTrack> > >" />  
+   <class name="edm::helpers::KeyVal<edm::Ref<std::vector<reco::Track>,reco::Track,edm::refhelper::FindUsingAdvance<std::vector<reco::Track>,reco::Track> >,std::vector<std::pair<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >,int> > >" />
+   <class name="std::map<unsigned int,edm::helpers::KeyVal<edm::Ref<std::vector<reco::Track>,reco::Track,edm::refhelper::FindUsingAdvance<std::vector<reco::Track>,reco::Track> >,std::vector<std::pair<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >,int> > > > " />
+   <class name="edm::AssociationMap<edm::OneToManyWithQuality<std::vector<reco::Track>,std::vector<reco::GsfTrack>,int,unsigned int> >" />
+   <class name="std::vector<std::pair<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >,int> >" />
+   <class name="std::pair<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >,int>" />
+
+
+
+</lcgdict>
+

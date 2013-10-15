@@ -21,9 +21,9 @@
 #include "DataFormats/CaloRecHit/interface/CaloClusterFwd.h" 
 #include "DataFormats/EgammaTrackReco/interface/ConversionTrack.h" 
 #include "DataFormats/EgammaTrackReco/interface/ConversionTrackFwd.h" 
-
-
+#include "DataFormats/Common/interface/AssociationMap.h"
 #include "DataFormats/Common/interface/Wrapper.h"
+#include "DataFormats/EgammaTrackReco/interface/GsfTrackToBremConvTracksMapFwd.h"
 
 namespace {
   struct dictionary {
@@ -48,7 +48,29 @@ namespace {
 
     reco::ConversionTrackCollection v11;
     edm::Wrapper<reco::ConversionTrackCollection> m11;    
-    
+
+    edm::helpers::KeyVal<edm::RefProd<std::vector<reco::GsfTrack> >,edm::RefProd<std::vector<reco::Track> > > am0;
+    edm::helpers::KeyVal<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >,std::vector<std::pair<edm::Ref<std::vector<reco::Track>,reco::Track,edm::refhelper::FindUsingAdvance<std::vector<reco::Track>,reco::Track> >,float> > > amf1;
+    edm::AssociationMap<edm::OneToManyWithQuality<std::vector<reco::GsfTrack>,std::vector<reco::Track>,float,unsigned int> > amf2;
+    edm::Wrapper<edm::AssociationMap<edm::OneToManyWithQuality<std::vector<reco::GsfTrack>,std::vector<reco::Track>,float,unsigned int> > > amf3;
+    std::map<unsigned int,edm::helpers::KeyVal<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >,std::vector<std::pair<edm::Ref<std::vector<reco::Track>,reco::Track,edm::refhelper::FindUsingAdvance<std::vector<reco::Track>,reco::Track> >,float> > > > amf4;
+    edm::helpers::KeyVal<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >,std::vector<std::pair<edm::Ref<std::vector<reco::Track>,reco::Track,edm::refhelper::FindUsingAdvance<std::vector<reco::Track>,reco::Track> >,int> > > am1;
+    edm::AssociationMap<edm::OneToManyWithQuality<std::vector<reco::GsfTrack>,std::vector<reco::Track>,int,unsigned int> > am2;
+    edm::Wrapper<edm::AssociationMap<edm::OneToManyWithQuality<std::vector<reco::GsfTrack>,std::vector<reco::Track>,int,unsigned int> > > am3;
+    std::map<unsigned int,edm::helpers::KeyVal<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >,std::vector<std::pair<edm::Ref<std::vector<reco::Track>,reco::Track,edm::refhelper::FindUsingAdvance<std::vector<reco::Track>,reco::Track> >,int> > > > am4;
+
+    edm::helpers::KeyVal<edm::RefProd<std::vector<reco::Track> >,edm::RefProd<std::vector<reco::GsfTrack> > > ma0;
+    edm::helpers::KeyVal<edm::Ref<std::vector<reco::Track>,reco::Track,edm::refhelper::FindUsingAdvance<std::vector<reco::Track>,reco::Track> >,std::vector<std::pair<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >,int> > > ma1;
+    edm::AssociationMap<edm::OneToManyWithQuality<std::vector<reco::Track>,std::vector<reco::GsfTrack>,int,unsigned int> > ma2;
+
+    edm::Wrapper<edm::AssociationMap<edm::OneToManyWithQuality<std::vector<reco::Track>,std::vector<reco::GsfTrack>,int,unsigned int> > > ma3;
+    std::map<unsigned int,edm::helpers::KeyVal<edm::Ref<std::vector<reco::Track>,reco::Track,edm::refhelper::FindUsingAdvance<std::vector<reco::Track>,reco::Track> >,std::vector<std::pair<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >,int> > > > ma4;
+
+    std::vector<std::pair<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >,int> > ma5;
+    std::pair<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >,int> ma6;
+
+
+
   };
 }
 

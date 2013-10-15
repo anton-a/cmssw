@@ -633,14 +633,39 @@ pair<bool,reco::Track> MuonTrackLoader::buildTrackAtPCA(const Trajectory& trajec
   bool bon = true;
   if(fabs(theService->magneticField()->inTesla(GlobalPoint(0,0,0)).z()) < 0.01) bon=false;   
   double ndof = trajectory.ndof(bon);
-  
+    
+  // set the inner and outer position/momentum
+  TrajectoryStateOnSurface outerTSOS;
+
+  if (trajectory.direction() == alongMomentum) {
+    outerTSOS = trajectory.lastMeasurement().updatedState(); 
+    innerTSOS = trajectory.firstMeasurement().updatedState(); 
+  } else {
+    outerTSOS = trajectory.firstMeasurement().updatedState();
+    innerTSOS = trajectory.lastMeasurement().updatedState();
+  }
+
+  GlobalPoint op = outerTSOS.globalParameters().position();
+  GlobalVector om = outerTSOS.globalParameters().momentum();
+  GlobalPoint ip = innerTSOS.globalParameters().position();
+  GlobalVector im = innerTSOS.globalParameters().momentum();
+
+  math::XYZPoint  outPos( op.x(), op.y(), op.z() );
+  math::XYZVector outMom( om.x(), om.y(), om.z() );
+  math::XYZPoint  inPos( ip.x(), ip.y(), ip.z() );
+  math::XYZVector inMom( im.x(), im.y(), im.z() );
+
   reco::Track track(trajectory.chiSquared(), 
-		    ndof,
-		    persistentPCA,
-		    persistentMomentum,
-		    ftsAtVtx.charge(),
-		    ftsAtVtx.curvilinearError());
-  
+        ndof,
+        persistentPCA,
+        persistentMomentum,
+        ftsAtVtx.charge(),
+        ftsAtVtx.curvilinearError(),
+        inPos,
+        inMom,
+        outPos,
+        outMom);
+
   return pair<bool,reco::Track>(true,track);
 }
 
@@ -672,12 +697,19 @@ pair<bool,reco::Track> MuonTrackLoader::buildTrackUpdatedAtPCA(const reco::Track
   GlobalVector p = ftsAtVtx.momentum();
   math::XYZVector persistentMomentum(p.x(),p.y(),p.z());
   
+  // looks like trackextra are not updated =>
+  // take the old outer position/momentum (AA)
   reco::Track updatedTrack(track.chi2(), 
 			   track.ndof(),
 			   persistentPCA,
 			   persistentMomentum,
 			   ftsAtVtx.charge(),
-			   ftsAtVtx.curvilinearError());
+			   ftsAtVtx.curvilinearError(),
+         track.innerPosition(),
+         track.innerMomentum(),
+         track.outerPosition(),
+         track.outerMomentum());
+
   
   return pair<bool,reco::Track>(true,updatedTrack);
 }
@@ -743,10 +775,10 @@ reco::TrackExtra MuonTrackLoader::buildTrackExtra(const Trajectory& trajectory) 
   math::XYZPoint  inpos( v.x(), v.y(), v.z() );   
   math::XYZVector inmom( p.x(), p.y(), p.z() );
 
-  reco::TrackExtra trackExtra(outpos, outmom, true, inpos, inmom, true,
+  reco::TrackExtra trackExtra(true, true,
                               outerTSOS.curvilinearError(), outerId,
                               innerTSOS.curvilinearError(), innerId,
-			      trajectory.direction(),trajectory.seedRef());
+                              trajectory.direction(),trajectory.seedRef());
   
   return trackExtra;
  

@@ -205,7 +205,7 @@ LinkByRecHit::testTrackAndClusterByRecHit ( const reco::PFRecTrack& track,
   //the boundaries of any cell that belongs to this cluster.
 
   const std::vector< reco::PFRecHitFraction >& 
-    fracs = cluster.recHitFractions();
+    fracs = *cluster.recHitFractions();
   
   bool linkedbyrechit = false;
   //loop rechits
@@ -427,7 +427,7 @@ LinkByRecHit::testECALAndPSByRecHit( const reco::PFCluster& clusterECAL,
   }
 
   // Get the rechits
-  const std::vector< reco::PFRecHitFraction >&  fracs = clusterECAL.recHitFractions();
+  const std::vector< reco::PFRecHitFraction >&  fracs = *clusterECAL.recHitFractions();
   bool linkedbyrechit = false;
   //loop rechits
   for(unsigned int rhit = 0; rhit < fracs.size(); ++rhit){

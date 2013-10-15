@@ -26,6 +26,9 @@ private:
 		    vertex };
   Constraint constraint_;
   edm::EDGetTokenT<GsfTrackVtxConstraintAssociationCollection> gsfTrackVtxConstraintTag_;
+
+  /// input for matching kf to gsf tracks (AA)
+  edm::EDGetTokenT<reco::TrackCollection> ckfTracks_;
 };
 
 #endif

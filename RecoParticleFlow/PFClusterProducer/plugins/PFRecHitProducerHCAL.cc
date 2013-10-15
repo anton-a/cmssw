@@ -35,8 +35,15 @@
 #include "RecoLocalCalo/HcalRecAlgos/interface/HcalSeverityLevelComputer.h"
 #include "RecoLocalCalo/HcalRecAlgos/interface/HcalSeverityLevelComputerRcd.h"
 
+// (AA)
+#include "DataFormats/CaloTowers/interface/CaloTowerDetId.h"
+
 using namespace std;
 using namespace edm;
+
+// temporary for debugging (AA)
+Bool_t DEBUG_PFFROMAOD = false;
+
 
 PFRecHitProducerHCAL::PFRecHitProducerHCAL(const edm::ParameterSet& iConfig)
   : PFRecHitProducer( iConfig )
@@ -147,6 +154,12 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
   // get the endcap geometry
   const CaloSubdetectorGeometry *hcalEndcapGeometry = 
     geoHandle->getSubdetectorGeometry(DetId::Hcal, HcalEndcap);
+
+
+// need the calo geometry as the subdet one cannot work with the calotowers (AA)
+  const CaloGeometry *caloGeometry = geoHandle.product();
+
+
 
   // Get Hcal Severity Level Computer, so that the severity of each rechit flag/status may be determined
   edm::ESHandle<HcalSeverityLevelComputer> hcalSevLvlComputerHndl;
@@ -356,7 +369,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		  pfrhCleaned = createHcalRecHit( detid, 
 						  energy, 
 						  PFLayer::HCAL_BARREL1, 
-						  hcalBarrelGeometry,
+//              hcalBarrelGeometry,
+              caloGeometry,            
 						  ct.id().rawId() );
 		  pfrhCleaned->setRescale(rescaleFactor);
 		  energy *= rescaleFactor;
@@ -364,7 +378,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		pfrh = createHcalRecHit( detid, 
 					 energy, 
 				 PFLayer::HCAL_BARREL1, 
-					 hcalBarrelGeometry,
+//           hcalBarrelGeometry,
+           caloGeometry,           
 					 ct.id().rawId() );
 		pfrh->setRescale(rescaleFactor);
 	      }
@@ -397,7 +412,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		  pfrhCleaned = createHcalRecHit( detid, 
 						  energy, 
 						  PFLayer::HCAL_ENDCAP, 
-						  hcalEndcapGeometry,
+//              hcalEndcapGeometry,
+              caloGeometry,              
 						  ct.id().rawId() );
 		  pfrhCleaned->setRescale(rescaleFactor);
 		  energy *= rescaleFactor;
@@ -405,7 +421,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		pfrh = createHcalRecHit( detid, 
 					 energy, 
 					 PFLayer::HCAL_ENDCAP, 
-					 hcalEndcapGeometry,
+//           hcalEndcapGeometry,
+           caloGeometry,           
 					 ct.id().rawId() );
 		pfrh->setRescale(rescaleFactor);
 	      }
@@ -476,7 +493,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		  pfrhHFHADCleaned = createHcalRecHit( detid, 
 						       theShortHitEnergy, 
 						       PFLayer::HF_HAD, 
-						       hcalEndcapGeometry,
+//                   hcalEndcapGeometry,
+                   caloGeometry,
 						       ct.id().rawId() );
 		  pfrhHFHADCleaned->setRescale(theShortHit->time());
 		  /*
@@ -504,7 +522,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		  pfrhHFEMCleaned = createHcalRecHit( detid, 
 						      theLongHitEnergy, 
 						      PFLayer::HF_EM, 
-						      hcalEndcapGeometry,
+//                  hcalEndcapGeometry,
+                  caloGeometry,
 						      ct.id().rawId() );
 		  pfrhHFEMCleaned->setRescale(theLongHit->time());
 		  /*
@@ -539,7 +558,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		    pfrhHFHADCleaned = createHcalRecHit( detid, 
 							 theShortHitEnergy, 
 							 PFLayer::HF_HAD, 
-							 hcalEndcapGeometry,
+//               hcalEndcapGeometry,
+               caloGeometry,
 							 ct.id().rawId() );
 		    pfrhHFHADCleaned->setRescale(theShortHit->time());
 		    /*
@@ -577,7 +597,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		    pfrhHFEMCleaned = createHcalRecHit( detid, 
 						      theLongHitEnergy, 
 						      PFLayer::HF_EM, 
-						      hcalEndcapGeometry,
+//                  hcalEndcapGeometry,
+                  caloGeometry,
 						      ct.id().rawId() );
 		    pfrhHFEMCleaned->setRescale(theLongHit->time());
 		    /*
@@ -607,7 +628,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		    pfrhHFEMCleaned29 = createHcalRecHit( detid, 
 							  theLongHitEnergy, 
 							  PFLayer::HF_EM, 
-							  hcalEndcapGeometry,
+//                hcalEndcapGeometry,
+                caloGeometry,
 							  ct.id().rawId() );
 		    pfrhHFEMCleaned29->setRescale(theLongHit->time());
 		    /*
@@ -625,7 +647,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		    pfrhHFHADCleaned29 = createHcalRecHit( detid, 
 							   theShortHitEnergy, 
 							   PFLayer::HF_HAD, 
-							   hcalEndcapGeometry,
+//                 hcalEndcapGeometry,
+                 caloGeometry,
 							   ct.id().rawId() );
 		    pfrhHFHADCleaned29->setRescale(theShortHit->time());
 		    /*
@@ -690,7 +713,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		    pfrhHFEMCleaned29 = createHcalRecHit( detid, 
 							  theLongHitEnergy29, 
 							  PFLayer::HF_EM, 
-							  hcalEndcapGeometry,
+//                hcalEndcapGeometry,
+                caloGeometry,
 							  ct.id().rawId() );
 		    pfrhHFEMCleaned29->setRescale(theLongHit29->time());
 		    /*
@@ -717,7 +741,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		    pfrhHFHADCleaned29 = createHcalRecHit( detid, 
 							 theShortHitEnergy29, 
 							 PFLayer::HF_HAD, 
-							 hcalEndcapGeometry,
+//               hcalEndcapGeometry,
+               caloGeometry,
 							 ct.id().rawId() );
 		    pfrhHFHADCleaned29->setRescale(theShortHit29->time());
 		    /*
@@ -753,7 +778,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		      pfrhHFHADCleaned29 = createHcalRecHit( detid, 
 							   theShortHitEnergy29, 
 							   PFLayer::HF_HAD, 
-							   hcalEndcapGeometry,
+//                 hcalEndcapGeometry,
+                 caloGeometry,
 							   ct.id().rawId() );
 		      pfrhHFHADCleaned29->setRescale(theShortHit29->time());
 		      /*
@@ -791,7 +817,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		      pfrhHFEMCleaned29 = createHcalRecHit( detid, 
 							    theLongHitEnergy29, 
 							    PFLayer::HF_EM, 
-							    hcalEndcapGeometry,
+//                  hcalEndcapGeometry,
+                  caloGeometry,
 							    ct.id().rawId() );
 		      pfrhHFEMCleaned29->setRescale(theLongHit29->time());
 		      /* 
@@ -818,7 +845,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		    pfrhHFEMCleaned29 = createHcalRecHit( detid, 
 							  theLongHitEnergy29, 
 							  PFLayer::HF_EM, 
-							  hcalEndcapGeometry,
+//                hcalEndcapGeometry,
+                caloGeometry,
 							  ct.id().rawId() );
 		    pfrhHFEMCleaned29->setRescale(theLongHit29->time());
 		    /*
@@ -836,7 +864,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		    pfrhHFHADCleaned29 = createHcalRecHit( detid, 
 							   theShortHitEnergy29, 
 							   PFLayer::HF_HAD, 
-							   hcalEndcapGeometry,
+//                 hcalEndcapGeometry,
+                 caloGeometry,
 							   ct.id().rawId() );
 		    pfrhHFHADCleaned29->setRescale(theShortHit29->time());
 		    /*
@@ -875,12 +904,14 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 		  pfrhHFEM = createHcalRecHit( detid, 
 					       energyemHF, 
 					       PFLayer::HF_EM, 
-					       hcalEndcapGeometry,
+//                 hcalEndcapGeometry,
+                 caloGeometry,
 					       ct.id().rawId() );
 		  pfrhHFHAD = createHcalRecHit( detid, 
 						energyhadHF, 
 						PFLayer::HF_HAD, 
-						hcalEndcapGeometry,
+//            hcalEndcapGeometry,
+            caloGeometry,
 						ct.id().rawId() );
 		  pfrhHFEM->setEnergyUp(energyhadHF);
 		  pfrhHFHAD->setEnergyUp(energyemHF);
@@ -999,7 +1030,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 	    pfrh = createHcalRecHit( detid, 
 				     energy, 
 				     PFLayer::HCAL_BARREL1, 
-				     hcalBarrelGeometry );
+//             hcalBarrelGeometry );
+             caloGeometry );
  	  }
 	  break;
 	case HcalEndcap:
@@ -1008,7 +1040,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 	    pfrh = createHcalRecHit( detid, 
 				     energy, 
 				     PFLayer::HCAL_ENDCAP, 
-				     hcalEndcapGeometry );	  
+//             hcalEndcapGeometry );    
+             caloGeometry );    
  	  }
 	  break;
 	case HcalForward:
@@ -1017,7 +1050,8 @@ void PFRecHitProducerHCAL::createRecHits(vector<reco::PFRecHit>& rechits,
 	    pfrh = createHcalRecHit( detid, 
 				     energy, 
 				     PFLayer::HF_HAD, 
-				     hcalEndcapGeometry );
+//             hcalEndcapGeometry );
+             caloGeometry );
  	  }
 	  break;
 	default:
@@ -1057,10 +1091,71 @@ reco::PFRecHit*
 PFRecHitProducerHCAL::createHcalRecHit( const DetId& detid,
 					double energy,
 					PFLayer::Layer layer,
-					const CaloSubdetectorGeometry* geom,
+//          const CaloSubdetectorGeometry* geom,
+          const CaloGeometry* geom,
 					unsigned newDetId ) {
+
+
+/*
+  // (AA) Option 1 --------------------------------------------------------------------------
+  // We can consistently use the innermost HB/HE cell for position
+  // It also provideas a clean reproduction of the approach at re-reco from AOD.
+  // The cluster depth is impacted by this choice, while track matching is not
+  // as it is done using eta/phi alone.
+
+  HcalSubdetector hcsd = HcalDetId(detid.rawId()).subdet();
   
+// just using the CT 
+// This is OK for matching but causes problems for the cluster position as the depth is not
+// appropriate for HCAL
+/////  bool useCaloTowerForGeometry = newDetId && (hcsd==HcalBarrel || hcsd==HcalEndcap);
+/////  const CaloCellGeometry *thisCell = useCaloTowerForGeometry? 
+/////                     geom->getGeometry(DetId(newDetId)) : geom->getGeometry(detid);
+
+  bool useFaceOfHBHE = newDetId && (hcsd==HcalBarrel || (hcsd==HcalEndcap
+  // the following is TEMPORARY for TESTING (avoid the segmentation issue in depth 3)!!!  (AA)
+  && (HcalDetId(detid.rawId())).ietaAbs()<28)
+  );
+
+  // use the innermost hcal cell in the tower for position of the PFRecHit 
+  const CaloCellGeometry *thisCell;
+  if (useCaloTowerForGeometry) {
+    CaloTowerDetId ctDetId(newDetId);
+    DetId frontCellId = DetId(HcalDetId(hcsd, ctDetId.ieta(), ctDetId.iphi(), 1));
+    thisCell = geom->getGeometry(frontCellId);
+  }
+  else thisCell = geom->getGeometry(detid);
+  //-------------------------------------------------------------------------------------------
+*/
+
+
+  // (AA) Option 2 ----------------------------------------------------------------------------
+  // Need to deal with the the segmentation at ieta=28,29 in depth 3
+  // To be as close as possible to the original code:
+  // for the cases when there is only a hit in depth 3 (nothing in 1,2)
+  // for the towers 28, 29 use the middle of the back of the cells in depth 2
+  // to assignee coordinates. 
+  // That will preserve the depth used in the original code and ensure consistent eta/phi 
+  // matching to tracks. Some negligible eta difference will equally affect the reconctruction
+  // from RECO and AOD
+
+
+  // these are the default coordinates from the first picked rechit in the tower (AA)
   const CaloCellGeometry *thisCell = geom->getGeometry(detid);
+
+/*
+  HcalDetId hcalCellId(detid);
+  if (hcalCellId.subdet()==HcalEndcap && hcalCellId.depth()==3 && hcalCellId.ietaAbs()==28) {
+     HcalDetId ctDetId(DetId(newId));
+     HcalDetId tmpId(HcalEndcap, ctDetId.ieta(), ctDetId.iphi(), 2);
+      
+  // under development  
+  
+  }
+*/
+  //-------------------------------------------------------------------------------------------
+
+
   if(!thisCell) {
     edm::LogError("PFRecHitProducerHCAL")
       <<"warning detid "<<detid.rawId()<<" not found in layer "
@@ -1088,19 +1183,76 @@ PFRecHitProducerHCAL::createHcalRecHit( const DetId& detid,
     new reco::PFRecHit( id,  layer, energy, 
 			position.x(), position.y(), position.z()+depth_correction, 
 			0,0,0 );
- 
-  
-  
-  
+      
   // set the corners
   const CaloCellGeometry::CornersVec& corners = thisCell->getCorners();
-
   assert( corners.size() == 8 );
-
   rh->setNECorner( corners[0].x(), corners[0].y(),  corners[0].z()+depth_correction );
   rh->setSECorner( corners[1].x(), corners[1].y(),  corners[1].z()+depth_correction );
   rh->setSWCorner( corners[2].x(), corners[2].y(),  corners[2].z()+depth_correction );
   rh->setNWCorner( corners[3].x(), corners[3].y(),  corners[3].z()+depth_correction );
+ 
+ 
+  if (DEBUG_PFFROMAOD) {
+ // test the position and the corners when using calotower id (AA)
+ // -> have the cell to the rechit cell above for testing.
+if (newDetId && (HcalDetId(detid.rawId()).subdet()==HcalBarrel || HcalDetId(detid.rawId()).subdet()==HcalEndcap)) {
+  
+      const CaloCellGeometry *thisCT = geom->getGeometry(DetId(newDetId));
+      const GlobalPoint& positionCT = thisCT->getPosition();
+      
+      const CaloTowerDetId ctDetId(newDetId); 
+
+      double dPhi = position.phi()-positionCT.phi();
+      while (dPhi>ROOT::Math::Pi()) dPhi -= 2.0*ROOT::Math::Pi();
+      while (dPhi<-ROOT::Math::Pi()) dPhi += 2.0*ROOT::Math::Pi();
+      double dEta = position.eta()-positionCT.eta();
+
+      double dR = dPhi*dPhi + dEta*dEta;
+      if (dR>0.0) dR=sqrt(dR);
+      
+      if (dR>0.01) {
+        std::cout << "\nieta " << ctDetId.ieta() << "  iphi " << ctDetId.iphi() << std::endl;
+        std::cout << "position xyz cell: " << position.x()   << "\t" << position.y()   << "\t" << position.z()   <<std::endl;
+        std::cout << "position xyz CT:   " << positionCT.x() << "\t" << positionCT.y() << "\t" << positionCT.z() <<std::endl;
+        std::cout << "position etaphi cell: " << position.eta()   << "\t" << position.phi()   << std::endl;
+        std::cout << "position etaphi CT:   " << positionCT.eta() << "\t" << positionCT.phi() << std::endl;
+        std::cout << "\n";
+      }
+      
+      
+      //now loop over the corners to make sure there are no surprises (AA)
+      double dPhi_c[8];
+      double dEta_c[8];
+      double dR_c[8];
+      double dR_c_max = 0;
+      
+      const CaloCellGeometry::CornersVec& cornersCT = thisCT->getCorners();
+      for (int c=0; c<8; ++c) {
+        dPhi_c[c] = corners[c].phi()-cornersCT[c].phi();
+        while (dPhi_c[c]>ROOT::Math::Pi()) dPhi_c[c] -= 2.0*ROOT::Math::Pi();
+        while (dPhi_c[c]<-ROOT::Math::Pi()) dPhi_c[c] += 2.0*ROOT::Math::Pi();
+        dEta_c[c] = corners[c].eta()-cornersCT[c].eta();
+
+        dR_c[c] = dPhi_c[c]*dPhi_c[c] + dEta_c[c]*dEta_c[c];
+        if (dR_c[c]>0.0) dR_c[c]=sqrt(dR_c[c]);
+        if (dR_c_max < dR_c[c]) dR_c_max = dR_c[c];
+      }
+      
+      if (dR_c_max > 0.01) {
+        std::cout << "\nieta " << ctDetId.ieta() << "  iphi " << ctDetId.iphi() << std::endl;
+        
+        for (int c=0; c<8; ++c) {
+          std::cout << "corner " << c << ": dR=" << dR_c[c] << "\tdPhi=" << dPhi_c[c]  << "\tdEta=" << dEta_c[c] 
+                    << std::endl;
+        }
+      }
+      
+
+
+   } // if hcal barrel or endcap
+
+} // if DEBUG_PFFROMAOD
  
   return rh;
 }
@@ -1443,5 +1595,4 @@ PFRecHitProducerHCAL::getNorth(const DetId& id,
   
   return north;
 } 
-
 

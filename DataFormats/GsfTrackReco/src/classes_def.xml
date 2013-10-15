@@ -14,7 +14,8 @@
    <class name="std::vector<reco::GsfTangent>"/>
 
 
-  <class name="reco::GsfTrackExtra" ClassVersion="10">
+  <class name="reco::GsfTrackExtra" ClassVersion="11">
+    <version ClassVersion="11" checksum="927878270"/>
    <version ClassVersion="10" checksum="1516446662"/>
   </class>
   <class name="std::vector<reco::GsfTrackExtra>"/>

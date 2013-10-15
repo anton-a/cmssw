@@ -32,7 +32,7 @@ KDTreeLinkerTrackHcal::insertFieldClusterElt(reco::PFBlockElement	*hcalCluster)
   // 	(clusterref->layer() == PFLayer::HCAL_BARREL1)))
   //     return;
 
-  const std::vector<reco::PFRecHitFraction> &fraction = clusterref->recHitFractions();
+  const std::vector<reco::PFRecHitFraction> &fraction = *clusterref->recHitFractions();
 
   // We create a list of hcalCluster
   fieldClusterSet_.insert(hcalCluster);
@@ -159,7 +159,7 @@ KDTreeLinkerTrackHcal::searchLinks()
 	  clusterIt != ret->second.end(); clusterIt++) {
 	
 	const reco::PFClusterRef clusterref = (*clusterIt)->clusterRef();
-	int fracsNbr = clusterref->recHitFractions().size();
+	int fracsNbr = clusterref->recHitFractions()->size();
 	
 	double _rhsizeEta = rhsizeEta * (1.5 + 0.5 / fracsNbr) + 0.2 * fabs(dHEta);
 	double _rhsizePhi = rhsizePhi * (1.5 + 0.5 / fracsNbr) + 0.2 * fabs(dHPhi);

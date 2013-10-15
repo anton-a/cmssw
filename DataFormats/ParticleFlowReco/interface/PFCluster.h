@@ -8,6 +8,8 @@
 #include "Rtypes.h" 
 
 #include "DataFormats/ParticleFlowReco/interface/PFRecHitFraction.h"
+#include "DataFormats/ParticleFlowReco/interface/PFRecHitFractionFwd.h"
+
 #include "DataFormats/ParticleFlowReco/interface/PFLayer.h"
 
 #include <iostream>
@@ -21,7 +23,7 @@ namespace reco {
 
   /**\class PFCluster
      \brief Particle flow cluster, see clustering algorithm in PFClusterAlgo
-     
+
      A particle flow cluster is defined by its energy and position, which are 
      calculated from a vector of PFRecHitFraction. This calculation is 
      performed in PFClusterAlgo.
@@ -29,7 +31,7 @@ namespace reco {
      \todo Clean up this class to a common base (talk to Paolo Meridiani)
      the extra internal stuff (like the vector of PFRecHitFraction's)
      could be moved to a PFClusterExtra.
-     
+
      \todo Now that PFRecHitFraction's hold a reference to the PFRecHit's, 
      put back the calculation of energy and position to PFCluster. 
 
@@ -59,10 +61,24 @@ namespace reco {
     /// add a given fraction of the rechit
     void addRecHitFraction( const reco::PFRecHitFraction& frac);
     
+    /// Get the transient PFRecHitFractions. Needed for storing them in a separate collection. Used only in the cluster producer. 
+    std::vector< reco::PFRecHitFraction > transientPFRecHitFractions() { return rechits_;}
+
     /// vector of rechit fractions
-    const std::vector< reco::PFRecHitFraction >& recHitFractions() const 
-      { return rechits_; }
-    
+    // in the previous format 
+    // this accessor is used by consumers of the info, but not internally
+    // convert it to use the new container (AA)
+//    const std::vector< reco::PFRecHitFraction >& recHitFractions() const 
+//      { return rechits_; }
+
+   // use the ref to the separately stored collection (AA) 
+    const PFRecHitFractionRef & recHitFractions() const { return recHitFracs_; }
+
+    /// Set the reference to the PFRecHitFractions (AA)
+    void setPFRecHitFractionsRef(PFRecHitFractionRef rhf) { recHitFracs_ = rhf; }
+
+
+
     /// set layer
     void setLayer( PFLayer::Layer layer);
     
@@ -141,11 +157,15 @@ namespace reco {
   private:
     
     /// vector of rechit fractions (transient)
+    // use these for internal manipulation (AA)
     std::vector< reco::PFRecHitFraction >  rechits_;
     
+    /// link to a vector of rechit fractions (AA)
+    // these will be persistent in RECO 
+    PFRecHitFractionRef  recHitFracs_;
+
     /// cluster position: rho, eta, phi (transient)
     REPPoint            posrep_;
-    
     
     /// \todo move to PFClusterTools
     static int    depthCorMode_;
@@ -167,6 +187,7 @@ namespace reco {
     int                 color_;
     
     friend class ::PFClusterAlgo;
+
   };
 }
 

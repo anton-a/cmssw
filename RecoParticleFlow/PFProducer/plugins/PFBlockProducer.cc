@@ -26,6 +26,11 @@
 
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 
+// needed for cluster/track linking when using DetId's(AA)
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
+
+
 #include <set>
 
 using namespace std;
@@ -78,16 +83,7 @@ PFBlockProducer::PFBlockProducer(const edm::ParameterSet& iConfig) {
   
   if(useEGPhotons_) {
     inputTagEGPhotons_
-      = iConfig.getParameter<InputTag>("EGPhotons");         
-  }
-  
-  useSuperClusters_ = iConfig.existsAs<bool>("useSuperClusters") ? iConfig.getParameter<bool>("useSuperClusters") : false;
-  
-  if (useSuperClusters_) {
-    inputTagSCBarrel_
-      = iConfig.getParameter<InputTag>("SCBarrel");      
-    inputTagSCEndcap_
-      = iConfig.getParameter<InputTag>("SCEndcap");     
+      = iConfig.getParameter<InputTag>("EGPhotons");
   }
 
   verbose_ = 
@@ -109,6 +105,8 @@ PFBlockProducer::PFBlockProducer(const edm::ParameterSet& iConfig) {
   useV0_ = iConfig.getParameter<bool>("useV0");
 
   useHO_=  iConfig.getParameter<bool>("useHO");
+
+  runOnAOD_ = iConfig.getParameter<bool>("runOnAOD");
 
   produces<reco::PFBlockCollection>();
   
@@ -164,9 +162,7 @@ PFBlockProducer::PFBlockProducer(const edm::ParameterSet& iConfig) {
 			      useIterTracking,
 			      nuclearInteractionsPurity,
 			      useEGPhotons_,
-			      EGPhotonSelectionCuts,
-			      useSuperClusters_
-			    );
+			      EGPhotonSelectionCuts );
   
   pfBlockAlgo_.setDebug(debug_);
 
@@ -185,16 +181,38 @@ PFBlockProducer::~PFBlockProducer() { }
 
 
 
+//void 
+//PFBlockProducer::beginJob() { }
+
+void 
+PFBlockProducer::beginRun(const edm::Run & run, 
+			  const edm::EventSetup & es) { 
+
+  // CaloGeometry is passed to PFBlockAlgo and used
+  // for cluster/track linking using detId's 
+  // when running on AOD files (AA)
+  // PFBlockAlgo checks if the pointer to CaloGeometry
+  // was set, or it is 0.
+  if (runOnAOD_) {
+	edm::ESHandle<CaloGeometry> caloGeo;
+	es.get<CaloGeometryRecord>().get(caloGeo);
+	pfBlockAlgo_.setCaloGeometry(caloGeo.product());
+  }
+  else {
+	pfBlockAlgo_.setCaloGeometry(0);
+  }
+
+}
+
+
 void 
 PFBlockProducer::produce(Event& iEvent, 
 			 const EventSetup& iSetup) {
   
   LogDebug("PFBlockProducer")<<"START event: "<<iEvent.id().event()
 			     <<" in run "<<iEvent.id().run()<<endl;
-  
-  
+
   // get rectracks
-  
   Handle< reco::PFRecTrackCollection > recTracks;
   
   // LogDebug("PFBlockProducer")<<"get reco tracks"<<endl;
@@ -336,28 +354,6 @@ PFBlockProducer::produce(Event& iEvent,
   if(!found && useEGPhotons_ )
     LogError("PFBlockProducer")<<" cannot get photons" 
 			       << inputTagEGPhotons_ << endl;
-			       
-  Handle< reco::SuperClusterCollection >  sceb;
-  Handle< reco::SuperClusterCollection >  scee;
-  
-  if (useSuperClusters_) {
-    found = iEvent.getByLabel(inputTagSCBarrel_,
-			      sceb);
-
-    if(!found)
-      LogError("PFBlockProducer")<<" cannot get sceb" 
-				<< inputTagSCBarrel_ << endl;
-	  
-				
-    
-    found = iEvent.getByLabel(inputTagSCEndcap_,
-			      scee);
-
-    if(!found)
-      LogError("PFBlockProducer")<<" cannot get scee" 
-				<< inputTagSCEndcap_ << endl;				       
-								
-  }
 
   if( usePFatHLT_  ) {
      pfBlockAlgo_.setInput( recTracks, 		
@@ -383,9 +379,7 @@ PFBlockProducer::produce(Event& iEvent,
 			   clustersHFEM,
 			   clustersHFHAD,
 			   clustersPS,
-			   egPhotons,
-			   sceb,
-			   scee);
+			   egPhotons);
   }
   pfBlockAlgo_.findBlocks();
   

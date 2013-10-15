@@ -141,11 +141,38 @@ NuclearTrackCorrector::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 
                 reco::TrackExtraRef teref= reco::TrackExtraRef ( rTrackExtras, i );
                 reco::TrackExtra newTrackExtra = getNewTrackExtra(algoResults);
-                (algoResults[0].second.first)->setExtra( teref ); 
+                (algoResults[0].second.first)->setExtra( teref );
+
+                Trajectory* theTraj = algoResults[0].first;
+
+                TrajectoryStateOnSurface outertsos;
+                TrajectoryStateOnSurface innertsos;
+ 
+                if (theTraj->direction() == alongMomentum) {
+                  outertsos = theTraj->lastMeasurement().updatedState();
+                  innertsos = theTraj->firstMeasurement().updatedState();
+                } else {
+                  outertsos = theTraj->firstMeasurement().updatedState();
+                  innertsos = theTraj->lastMeasurement().updatedState();
+                }
+
+                GlobalPoint v = outertsos.globalParameters().position();
+                GlobalVector p = outertsos.globalParameters().momentum();
+                math::XYZVector outmom( p.x(), p.y(), p.z() );
+                math::XYZPoint  outpos( v.x(), v.y(), v.z() );
+                v = innertsos.globalParameters().position();
+                p = innertsos.globalParameters().momentum();
+                math::XYZVector inmom( p.x(), p.y(), p.z() );
+                math::XYZPoint  inpos( v.x(), v.y(), v.z() );
+
+                (algoResults[0].second.first)->setInnerPosition(inpos);
+                (algoResults[0].second.first)->setInnerMomentum(inmom);
+                (algoResults[0].second.first)->setOuterPosition(outpos);
+                (algoResults[0].second.first)->setOuterMomentum(outmom);
 
                 Output_track->push_back(*algoResults[0].second.first);        
                 Output_trackextra->push_back( newTrackExtra );
-	        Output_traj->push_back(newTraj);
+                Output_traj->push_back(newTraj);
 
           }
         }
@@ -293,16 +320,7 @@ reco::TrackExtra NuclearTrackCorrector::getNewTrackExtra(const AlgoProductCollec
                   innerId   = theTraj->lastMeasurement().recHit()->geographicalId().rawId();
                 }
 
-                GlobalPoint v = outertsos.globalParameters().position();
-                GlobalVector p = outertsos.globalParameters().momentum();
-                math::XYZVector outmom( p.x(), p.y(), p.z() );
-                math::XYZPoint  outpos( v.x(), v.y(), v.z() );
-                v = innertsos.globalParameters().position();
-                p = innertsos.globalParameters().momentum();
-                math::XYZVector inmom( p.x(), p.y(), p.z() );
-                math::XYZPoint  inpos( v.x(), v.y(), v.z() );
-
-                return reco::TrackExtra (outpos, outmom, true, inpos, inmom, true,
+                return reco::TrackExtra (true, true,
                                         outertsos.curvilinearError(), outerId,
                                         innertsos.curvilinearError(), innerId, seedDir);
 

@@ -236,12 +236,17 @@ FastTrackMerger::produce(edm::Event& e, const edm::EventSetup& es) {
 	reco::Track aRecoTrack(*aTrack);
 	recoTracks->push_back(aRecoTrack);
 	
-
-	recoTrackExtras->push_back(reco::TrackExtra(aRecoTrack.outerPosition(), aRecoTrack.outerMomentum(), aRecoTrack.outerOk(),
-					       aRecoTrack.innerPosition(), aRecoTrack.innerMomentum(), aRecoTrack.innerOk(),
-					       aRecoTrack.outerStateCovariance(), aRecoTrack.outerDetId(),
-					       aRecoTrack.innerStateCovariance(), aRecoTrack.innerDetId(),
-					       aRecoTrack.seedDirection(), aRecoTrack.seedRef() ) ); 
+// use the reduced extra format (AA)
+//  recoTrackExtras->push_back(reco::TrackExtra(aRecoTrack.outerPosition(), aRecoTrack.outerMomentum(), aRecoTrack.outerOk(),
+//                 aRecoTrack.innerPosition(), aRecoTrack.innerMomentum(), aRecoTrack.innerOk(),
+//                 aRecoTrack.outerStateCovariance(), aRecoTrack.outerDetId(),
+//                 aRecoTrack.innerStateCovariance(), aRecoTrack.innerDetId(),
+//                 aRecoTrack.seedDirection(), aRecoTrack.seedRef() ) ); 
+  recoTrackExtras->push_back(reco::TrackExtra( aRecoTrack.outerOk(),
+                 aRecoTrack.innerOk(),
+                 aRecoTrack.outerStateCovariance(), aRecoTrack.outerDetId(),
+                 aRecoTrack.innerStateCovariance(), aRecoTrack.innerDetId(),
+                 aRecoTrack.seedDirection(), aRecoTrack.seedRef() ) ); 
 
 
 	recoTracks->back().setExtra(reco::TrackExtraRef(rTrackExtras,recoTrackExtras->size()-1)); 
@@ -405,11 +410,13 @@ FastTrackMerger::produce(edm::Event& e, const edm::EventSetup& es) {
 
       // std::cout << "initial TrackAlgo = " << trackAlgo << "\tNAME " << aTrack.algoName() << "\tnumber = " << aTrack.algo() << std::endl;
 
-      reco::TrackExtra aTrackExtra(aTrack.outerPosition(),
-				   aTrack.outerMomentum(),
+// use the reduced extra format (AA)
+      reco::TrackExtra aTrackExtra(
+//           aTrack.outerPosition(),
+//				   aTrack.outerMomentum(),
 				   aTrack.outerOk(),
-				   aTrack.innerPosition(),
-				   aTrack.innerMomentum(),
+//				   aTrack.innerPosition(),
+//				   aTrack.innerMomentum(),
 				   aTrack.innerOk(),
 				   aTrack.outerStateCovariance(),
 				   aTrack.outerDetId(),

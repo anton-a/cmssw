@@ -416,8 +416,8 @@ namespace cms
 	  //--------NEW----------
           // Fill TrackExtra collection
 	  outputTrkExtras->push_back( reco::TrackExtra( 
-                        theTrack.outerPosition(), theTrack.outerMomentum(), theTrack.outerOk(),
-                        theTrack.innerPosition(), theTrack.innerMomentum(), theTrack.innerOk(),
+                        theTrack.outerOk(),
+                        theTrack.innerOk(),
                         theTrack.outerStateCovariance(), theTrack.outerDetId(),
                         theTrack.innerStateCovariance(), theTrack.innerDetId(),
                         theTrack.seedDirection(), origSeedRef ) );
@@ -534,8 +534,8 @@ namespace cms
 	  //--------NEW----------
           // Fill TrackExtra collection
           outputTrkExtras->push_back( reco::TrackExtra( 
-                        theTrack.outerPosition(), theTrack.outerMomentum(), theTrack.outerOk(),
-                        theTrack.innerPosition(), theTrack.innerMomentum(), theTrack.innerOk(),
+                        theTrack.outerOk(),
+                        theTrack.innerOk(),
                         theTrack.outerStateCovariance(), theTrack.outerDetId(),
                         theTrack.innerStateCovariance(), theTrack.innerDetId(),
                         theTrack.seedDirection(), origSeedRef ) );

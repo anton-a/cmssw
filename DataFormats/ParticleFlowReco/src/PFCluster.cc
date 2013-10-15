@@ -106,7 +106,7 @@ std::ostream& reco::operator<<(std::ostream& out,
   const math::XYZPoint&  pos = cluster.position();
   const PFCluster::REPPoint&  posrep = cluster.positionREP();
   const std::vector< reco::PFRecHitFraction >& fracs = 
-    cluster.recHitFractions();
+    *cluster.recHitFractions();
   
   out<<"PFcluster "
      <<", layer: "<<cluster.layer()

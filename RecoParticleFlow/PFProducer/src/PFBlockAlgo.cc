@@ -1,11 +1,17 @@
 #include "RecoParticleFlow/PFProducer/interface/PFBlockAlgo.h"
 #include "RecoParticleFlow/PFProducer/interface/Utils.h"
+
 #include "RecoParticleFlow/PFClusterTools/interface/LinkByRecHit.h"
+#include "RecoParticleFlow/PFClusterTools/interface/LinkByDetId.h"
+
+
 #include "DataFormats/ParticleFlowReco/interface/PFBlock.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/ParticleFlowReco/interface/PFDisplacedVertex.h" // gouzevitch
 
 #include "DataFormats/ParticleFlowReco/interface/PFRecHit.h"
+
+#include <iostream>
 
 #include <stdexcept>
 #include "TMath.h"
@@ -34,8 +40,7 @@ void PFBlockAlgo::setParameters( std::vector<double>& DPtovPtCut,
 				 bool useIterTracking,
 				 int nuclearInteractionsPurity,
 				 bool useEGPhotons,
-				 std::vector<double>& photonSelectionCuts,
-				 bool useSuperClusters) {
+				 std::vector<double>& photonSelectionCuts) {
   
   DPtovPtCut_    = DPtovPtCut;
   NHitCut_       = NHitCut;
@@ -56,8 +61,6 @@ void PFBlockAlgo::setParameters( std::vector<double>& DPtovPtCut,
 					     );
 
 
-  useSuperClusters_ = useSuperClusters;
-    
 }
 
 // Glowinski & Gouzevitch
@@ -85,9 +88,22 @@ PFBlockAlgo::findBlocks() {
 
   // Glowinski & Gouzevitch
   if (useKDTreeTrackEcalLinker_) {
-    TELinker_.process();
-    THLinker_.process();
-    PSELinker_.process();
+
+	  if (caloGeometryForLinking_) { // running on AOD (AA)
+		  TELinkerAOD_.setCaloGeometry(caloGeometryForLinking_);
+		  THLinkerAOD_.setCaloGeometry(caloGeometryForLinking_);
+		  PSELinkerAOD_.setCaloGeometry(caloGeometryForLinking_);
+		  
+		  TELinkerAOD_.process();
+		  THLinkerAOD_.process();
+		  PSELinkerAOD_.process();
+	  }
+	  else {
+		  TELinker_.process();
+		  THLinker_.process();
+		  PSELinker_.process();
+	  }
+
   }
   // !Glowinski & Gouzevitch
 
@@ -244,6 +260,7 @@ PFBlockAlgo::packLinks( reco::PFBlock& block,
   const edm::OwnVector< reco::PFBlockElement >& els = block.elements();
   
   block.bookLinkData();
+
   unsigned elsize = els.size();
   unsigned ilStart = 0;
   //First Loop: update all link data
@@ -261,13 +278,14 @@ PFBlockAlgo::packLinks( reco::PFBlock& block,
 
       // are these elements already linked ?
       // this can be optimized
+
       unsigned linksize = links.size();
       for( unsigned il = ilStart; il<linksize; ++il ) {
 	// The following three lines exploits the increasing-element2 ordering of links.
 	if ( links[il].element2() < i1 ) ilStart = il;
 	if ( links[il].element2() > i1 ) break;
-	if( (links[il].element1() == i2 &&
-             links[il].element2() == i1) ) {  // yes
+	if( (links[il].element1() == i2 && 
+	     links[il].element2() == i1) ) { // yes
 	  
 	  dist = links[il].dist();
 	  linked = true;
@@ -381,8 +399,12 @@ PFBlockAlgo::link( const reco::PFBlockElement* el1,
 	  dist = LinkByRecHit::computeDist(xECAL/1000.,yECAL/1000.,xPS/1000.  ,yPS/1000, false);
 	}
 
-      } else { //Old algorithm
-	dist = LinkByRecHit::testECALAndPSByRecHit( *ecalref, *psref ,debug_);
+      } else {// Old algorithm
+			// caloGeometryForLinking_ in PFBlockAlgo is set to 0 when we want to use calorimeter cell coordinates stored
+			// in the PFRecHits. For re-reco from AOD it is used along with the detId's to get this information
+			caloGeometryForLinking_ == 0?
+				dist = LinkByRecHit::testECALAndPSByRecHit( *ecalref, *psref ,debug_) :
+				dist = LinkByDetId::testECALAndPSByDetId( *ecalref, *psref, caloGeometryForLinking_, debug_);
       }
 
       //      linktest = PFBlock::LINKTEST_RECHIT;
@@ -443,7 +465,9 @@ PFBlockAlgo::link( const reco::PFBlockElement* el1,
 
       } else {// Old algorithm
 	if ( trackref->extrapolatedPoint( reco::PFTrajectoryPoint::ECALShowerMax ).isValid() )
-	  dist = LinkByRecHit::testTrackAndClusterByRecHit( *trackref, *clusterref, false, debug_ );
+		caloGeometryForLinking_ == 0?
+			dist = LinkByRecHit::testTrackAndClusterByRecHit( *trackref, *clusterref, false, debug_ ) :
+			dist = LinkByDetId::testTrackAndClusterByDetId( *trackref, *clusterref, caloGeometryForLinking_, false, debug_ );
 	else
 	  dist = -1.;
       }
@@ -527,7 +551,9 @@ PFBlockAlgo::link( const reco::PFBlockElement* el1,
 
       } else {// Old algorithm
 	if ( trackref->extrapolatedPoint( reco::PFTrajectoryPoint::HCALEntrance ).isValid() )
-	  dist = LinkByRecHit::testTrackAndClusterByRecHit( *trackref, *clusterref, false, debug_ );
+		caloGeometryForLinking_ == 0 ?
+			dist = LinkByRecHit::testTrackAndClusterByRecHit( *trackref, *clusterref, false, debug_ ) :
+			dist = LinkByDetId::testTrackAndClusterByDetId( *trackref, *clusterref, caloGeometryForLinking_, false, debug_ );
 	else
 	  dist = -1.;
       }
@@ -551,7 +577,9 @@ PFBlockAlgo::link( const reco::PFBlockElement* el1,
       //Same value is used in PFTrackTransformer::addPoints() for HOLayer, but allow for some rounding precision
       if ( lowEl->trackRef()->pt() > 3.00001 && trackref->extrapolatedPoint( reco::PFTrajectoryPoint::HOLayer ).isValid() ) {
 	//	cout<<"TRACKandHO2"<<endl;
-	dist = LinkByRecHit::testTrackAndClusterByRecHit( *trackref, *clusterref, false, debug_ );
+		caloGeometryForLinking_ == 0 ?
+			dist = LinkByRecHit::testTrackAndClusterByRecHit( *trackref, *clusterref, false, debug_ ) :
+			dist = LinkByDetId::testTrackAndClusterByDetId( *trackref, *clusterref, caloGeometryForLinking_, false, debug_ );
 	
 	//	cout <<"dist TRACKandHO "<<dist<<endl;
       } else {
@@ -630,7 +658,9 @@ PFBlockAlgo::link( const reco::PFBlockElement* el1,
       const reco::PFBlockElementGsfTrack *  GsfEl =  dynamic_cast<const reco::PFBlockElementGsfTrack*>(highEl);
       const PFRecTrack * myTrack =  &(GsfEl->GsftrackPF());
       if ( myTrack->extrapolatedPoint( reco::PFTrajectoryPoint::ECALShowerMax ).isValid() )
-	dist = LinkByRecHit::testTrackAndClusterByRecHit( *myTrack, *clusterref, false, debug_ );
+			caloGeometryForLinking_ == 0 ?
+				dist = LinkByRecHit::testTrackAndClusterByRecHit( *myTrack, *clusterref, false, debug_ ) :
+				dist = LinkByDetId::testTrackAndClusterByDetId( *myTrack, *clusterref, caloGeometryForLinking_, false, debug_ );
       else
 	dist = -1.;
       //   linktest = PFBlock::LINKTEST_RECHIT;
@@ -754,7 +784,9 @@ PFBlockAlgo::link( const reco::PFBlockElement* el1,
       */
       bool isBrem = true;
       if ( myTrack->extrapolatedPoint( reco::PFTrajectoryPoint::ECALShowerMax ).isValid() )
-	dist = LinkByRecHit::testTrackAndClusterByRecHit( *myTrack, *clusterref, isBrem, debug_);
+			caloGeometryForLinking_ == 0 ?
+			dist = LinkByRecHit::testTrackAndClusterByRecHit( *myTrack, *clusterref, isBrem, debug_) :
+			dist = LinkByDetId::testTrackAndClusterByDetId( *myTrack, *clusterref, caloGeometryForLinking_, isBrem, debug_);
       else
 	dist = -1.;
       if( debug_ && dist > 0. ) 
@@ -770,7 +802,9 @@ PFBlockAlgo::link( const reco::PFBlockElement* el1,
       const reco::PFBlockElementGsfTrack *  GsfEl =  dynamic_cast<const reco::PFBlockElementGsfTrack*>(highEl);
       const PFRecTrack * myTrack =  &(GsfEl->GsftrackPF());
       if ( myTrack->extrapolatedPoint( reco::PFTrajectoryPoint::HCALEntrance ).isValid() )
-	dist = LinkByRecHit::testTrackAndClusterByRecHit( *myTrack, *clusterref, false, debug_ );
+			caloGeometryForLinking_ == 0 ?
+			dist = LinkByRecHit::testTrackAndClusterByRecHit( *myTrack, *clusterref, false, debug_ ) :
+			dist = LinkByDetId::testTrackAndClusterByDetId( *myTrack, *clusterref, caloGeometryForLinking_, false, debug_ );
       else
 	dist = -1.;
 
@@ -785,7 +819,9 @@ PFBlockAlgo::link( const reco::PFBlockElement* el1,
       const PFRecTrack * myTrack = &(BremEl->trackPF());
       bool isBrem = true;
       if ( myTrack->extrapolatedPoint( reco::PFTrajectoryPoint::HCALEntrance ).isValid() )
-	dist = LinkByRecHit::testTrackAndClusterByRecHit( *myTrack, *clusterref, isBrem, debug_);
+			caloGeometryForLinking_ == 0 ?
+			dist = LinkByRecHit::testTrackAndClusterByRecHit( *myTrack, *clusterref, isBrem, debug_) :
+			dist = LinkByDetId::testTrackAndClusterByDetId( *myTrack, *clusterref, caloGeometryForLinking_, isBrem, debug_);
       else
 	dist = -1.;
       break;
@@ -1175,8 +1211,6 @@ PFBlockAlgo::checkMaskSize( const reco::PFRecTrackCollection& tracks,
 			    const reco::PFClusterCollection&  hfhads,
 			    const reco::PFClusterCollection&  pss, 
 			    const reco::PhotonCollection&  egphh, 
-			    const reco::SuperClusterCollection&  sceb, 
-			    const reco::SuperClusterCollection&  scee, 			    
 			    const Mask& trackMask, 
 			    const Mask& gsftrackMask,  
 			    const Mask& ecalMask,
@@ -1185,8 +1219,7 @@ PFBlockAlgo::checkMaskSize( const reco::PFRecTrackCollection& tracks,
 			    const Mask& hfemMask,
 			    const Mask& hfhadMask,		      
 			    const Mask& psMask,
-			    const Mask& phMask,
-			    const Mask& scMask) const {
+			    const Mask& phMask) const {
 
   if( !trackMask.empty() && 
       trackMask.size() != tracks.size() ) {
@@ -1253,21 +1286,13 @@ PFBlockAlgo::checkMaskSize( const reco::PFRecTrackCollection& tracks,
     throw std::length_error( err.c_str() );
   }
   
-  if( !phMask.empty() && 
+    if( !phMask.empty() && 
       phMask.size() != egphh.size() ) {
     string err = "PFBlockAlgo::setInput: ";
     err += "The size of the photon mask is different ";
     err += "from the size of the photon vector.";
     throw std::length_error( err.c_str() );
   }
-  
-  if( !scMask.empty() && 
-      scMask.size() != (sceb.size() + scee.size()) ) {
-    string err = "PFBlockAlgo::setInput: ";
-    err += "The size of the SC mask is different ";
-    err += "from the size of the SC vectors.";
-    throw std::length_error( err.c_str() );
-  }  
 
 }
 

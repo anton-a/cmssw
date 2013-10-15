@@ -22,7 +22,7 @@ TrackProducerWithSCAssociation::TrackProducerWithSCAssociation(const edm::Parame
   theAlgo(iConfig)
 {
   setConf(iConfig);
-  setSrc( consumes<TrackCandidateCollection>(iConfig.getParameter<edm::InputTag>( "src" )), 
+  setSrc( consumes<TrackCandidateCollection>(iConfig.getParameter<edm::InputTag>( "src" )),
           consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>( "beamSpot" )));
   setAlias( iConfig.getParameter<std::string>( "@module_label" ) );
 
@@ -321,6 +321,11 @@ TrackingRecHitRefProd rHits = evt.getRefBeforePut<TrackingRecHitCollection>();
     reco::Track & track = selTracks->back();
     track.setExtra( teref );
 
+    track.setInnerPosition(inpos);
+    track.setInnerMomentum(inmom);
+    track.setOuterPosition(outpos);
+    track.setOuterMomentum(outmom);
+
     //======= I want to set the second hitPattern here =============
     if (theSchool.isValid())
       {
@@ -329,12 +334,10 @@ TrackingRecHitRefProd rHits = evt.getRefBeforePut<TrackingRecHitCollection>();
       }
     //==============================================================
 
-
-    selTrackExtras->push_back( reco::TrackExtra (outpos, outmom, true, inpos, inmom, true,
+    selTrackExtras->push_back( reco::TrackExtra (true, true,
                                                  outertsos.curvilinearError(), outerId,
                                                  innertsos.curvilinearError(), innerId,
                                                  seedDir,theTraj->seedRef()));
-
 
     reco::TrackExtra & tx = selTrackExtras->back();
    // ---  NOTA BENE: the convention is to sort hits and measurements "along the momentum".

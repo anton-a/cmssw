@@ -9,7 +9,20 @@ GsfTrackExtra::GsfTrackExtra( const std::vector<GsfComponent5D>& outerStates,
   outerStates_(outerStates), positiveOuterStatePz_(outerLocalPzSign>0.),
   innerStates_(innerStates), positiveInnerStatePz_(innerLocalPzSign>0.),
   tangents_(tangents) {}
-                                                                                                            
+
+// constructor from outermost position, momentum, and matched CTF track (AA)
+GsfTrackExtra::GsfTrackExtra( const std::vector<GsfComponent5D>& outerStates,
+       const double& outerLocalPzSign, 
+       const std::vector<GsfComponent5D>& innerStates, 
+       const double& innerLocalPzSign,
+       const std::vector<GsfTangent>& tangents,
+       reco::TrackRef& matchedCtfTrack) :
+  outerStates_(outerStates), positiveOuterStatePz_(outerLocalPzSign>0.),
+  innerStates_(innerStates), positiveInnerStatePz_(innerLocalPzSign>0.),
+  tangents_(tangents),
+  matchedCtfTrack_(matchedCtfTrack)
+  {}
+
 std::vector<double> 
 GsfTrackExtra::weights (const std::vector<GsfComponent5D>& states) const
 {

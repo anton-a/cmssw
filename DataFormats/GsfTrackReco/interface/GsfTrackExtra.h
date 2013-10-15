@@ -10,6 +10,9 @@
 #include "DataFormats/GsfTrackReco/interface/GsfComponent5D.h"
 #include "DataFormats/GsfTrackReco/interface/GsfTangent.h"
 
+// for the ctftrack ref (AA)
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
+
 #include <iostream>
 
 namespace reco {
@@ -30,10 +33,20 @@ namespace reco {
     GsfTrackExtra() { }
     /// constructor from outermost position and momentum
     GsfTrackExtra( const std::vector<GsfComponent5D>& outerStates,
-		   const double& outerLocalPzSign, 
-		   const std::vector<GsfComponent5D>& innerStates, 
-		   const double& innerLocalPzSign,
-		   const std::vector<GsfTangent>& tangents);
+       const double& outerLocalPzSign, 
+       const std::vector<GsfComponent5D>& innerStates, 
+       const double& innerLocalPzSign,
+       const std::vector<GsfTangent>& tangents);
+
+     /// constructor from outermost position, momentum, and matched CTF track (AA)
+    GsfTrackExtra( const std::vector<GsfComponent5D>& outerStates,
+       const double& outerLocalPzSign, 
+       const std::vector<GsfComponent5D>& innerStates, 
+       const double& innerLocalPzSign,
+       const std::vector<GsfTangent>& tangents,
+       reco::TrackRef& matchedCtfTrack);
+
+
     /// sign of local P_z at outermost state
     double outerStateLocalPzSign() const {return positiveOuterStatePz_ ? 1. : -1.;}
     /// weights at outermost state
@@ -77,6 +90,13 @@ namespace reco {
       return tangents_[index].deltaP();
     }
 
+    /// set a reference to a matched ctftrack if there is no track seed (AA)
+    void SetMatchedCtfTrack ( const reco::TrackRef tr) { matchedCtfTrack_ = tr; }
+
+    /// return reference to a matched ctftrack for gsftracks with no track seed (AA)
+    /// could be null - check before using
+    const reco::TrackRef MatchedCtfTrack() const { return matchedCtfTrack_; }
+
   private:
     /// extract weights from states
     std::vector<double> weights (const std::vector<GsfComponent5D>& states) const;
@@ -96,6 +116,10 @@ namespace reco {
     bool positiveInnerStatePz_;
     /// information for tangents
     std::vector<GsfTangent> tangents_;
+
+    /// matched ctf track (if there is no track seed) (AA)
+    reco::TrackRef matchedCtfTrack_;
+
   };
 
 }

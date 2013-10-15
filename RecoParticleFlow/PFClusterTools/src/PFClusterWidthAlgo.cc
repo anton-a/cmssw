@@ -55,7 +55,7 @@ PFClusterWidthAlgo::PFClusterWidthAlgo(const std::vector<const reco::PFCluster *
     double SeedEta = -1.;
 
     for(unsigned int icl=0; icl<nclust; ++icl) {
-      const std::vector< reco::PFRecHitFraction >& PFRecHits =  pfclust[icl]->recHitFractions();
+      const std::vector< reco::PFRecHitFraction >& PFRecHits =  *pfclust[icl]->recHitFractions();
       
       
       for ( std::vector< reco::PFRecHitFraction >::const_iterator it = PFRecHits.begin(); 
@@ -112,7 +112,7 @@ PFClusterWidthAlgo::PFClusterWidthAlgo(const std::vector<const reco::PFCluster *
     } // end for ncluster
 
     //for the first cluster (from GSF) computed sigmaEtaEta
-    const std::vector< reco::PFRecHitFraction >& PFRecHits =  pfclust[0]->recHitFractions();
+    const std::vector< reco::PFRecHitFraction >& PFRecHits =  *pfclust[0]->recHitFractions();
     for ( std::vector< reco::PFRecHitFraction >::const_iterator it = PFRecHits.begin(); 
 	  it != PFRecHits.end(); ++it) {
       const PFRecHitRef& RefPFRecHit = it->recHitRef(); 

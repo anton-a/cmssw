@@ -201,13 +201,21 @@ void L3TkMuonProducer::produce(Event& event, const EventSetup& eventSetup){
     LogDebug(metname)<<"copy the trackExtra too, and change the seedref";
     edm::RefToBase<TrajectorySeed> seedRef(f->second.second);
     //do not use the copy constructor, otherwise the hit Ref are still the same
+    // Use the reduced extra (AA)
+//    (*outTrackExtras)[i] = TrackExtra(
+//              trk.outerPosition(), trk.outerMomentum(), trk.outerOk(),
+//              trk.innerPosition(), trk.innerMomentum(), trk.innerOk(),
+//              trk.outerStateCovariance(), trk.outerDetId(),
+//              trk.innerStateCovariance(), trk.innerDetId(),
+//              seedRef->direction(),seedRef
+//              );
     (*outTrackExtras)[i] = TrackExtra(
-				      trk.outerPosition(), trk.outerMomentum(), trk.outerOk(),
-				      trk.innerPosition(), trk.innerMomentum(), trk.innerOk(),
-				      trk.outerStateCovariance(), trk.outerDetId(),
-				      trk.innerStateCovariance(), trk.innerDetId(),
-				      seedRef->direction(),seedRef
-				      );
+              trk.outerOk(),
+              trk.innerOk(),
+              trk.outerStateCovariance(), trk.outerDetId(),
+              trk.innerStateCovariance(), trk.innerDetId(),
+              seedRef->direction(),seedRef
+              );
 
     LogDebug(metname)<<"copy the hits too";
     unsigned int iRH=0;

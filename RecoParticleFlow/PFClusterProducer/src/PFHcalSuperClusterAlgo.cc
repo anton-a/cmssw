@@ -66,8 +66,9 @@ std::pair<double, double> PFHcalSuperClusterAlgo::calculatePosition(const reco::
   double posPhi = 0.0;
   double w0_ = 4.2;
   const double clusterEnergy = cluster.energy();
-  if (cluster.energy()>0.0 && cluster.recHitFractions().size()>0) {
-    const std::vector <reco::PFRecHitFraction >& pfhitsandfracs = cluster.recHitFractions();
+  // modified for the new format of PFCluster (AA)
+  if (cluster.energy()>0.0 && (*cluster.recHitFractions()).size()>0) {
+    const std::vector <reco::PFRecHitFraction >& pfhitsandfracs = *cluster.recHitFractions();
     for (std::vector<reco::PFRecHitFraction>::const_iterator it = pfhitsandfracs.begin(); it != pfhitsandfracs.end(); ++it) {
       const reco::PFRecHitRef rechit = it->recHitRef();
       double hitEta = rechit->positionREP().Eta();
@@ -105,9 +106,9 @@ std::pair<double, double> PFHcalSuperClusterAlgo::calculateWidths(const reco::PF
   const double clusterEta = calculatePosition(cluster).first;
   const double clusterPhi = calculatePosition(cluster).second;
   const double clusterEnergy = cluster.energy();
-  if(cluster.energy()>0.0 && cluster.recHitFractions().size()>0) {
+  if(cluster.energy()>0.0 && (*cluster.recHitFractions()).size()>0) {
     double hitEta, hitPhi, hitEnergy, dEta, dPhi; 
-    const std::vector< reco::PFRecHitFraction >& pfhitsandfracs = cluster.recHitFractions();
+    const std::vector< reco::PFRecHitFraction >& pfhitsandfracs = *cluster.recHitFractions();
     for (std::vector<reco::PFRecHitFraction>::const_iterator it = pfhitsandfracs.begin(); it != pfhitsandfracs.end(); ++it) {
       const reco::PFRecHitRef rechit = it->recHitRef();
       //      rechit->calculatePositionREP();

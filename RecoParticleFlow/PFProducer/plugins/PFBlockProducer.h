@@ -39,6 +39,7 @@ class PFBlockProducer : public edm::EDProducer {
   ~PFBlockProducer();
   
   virtual void produce(edm::Event&, const edm::EventSetup&) override;
+  void beginRun(const edm::Run & run, const edm::EventSetup & es) override;
 
  private:
 
@@ -58,8 +59,6 @@ class PFBlockProducer : public edm::EDProducer {
   edm::InputTag   inputTagPFConversions_;
   edm::InputTag   inputTagPFV0_;
   edm::InputTag   inputTagEGPhotons_;
-  edm::InputTag   inputTagSCBarrel_;
-  edm::InputTag   inputTagSCEndcap_;  
   
   // Link track and HCAL clusters to HO clusters ?
   bool useHO_;
@@ -72,9 +71,6 @@ class PFBlockProducer : public edm::EDProducer {
 
   /// use EG photons ? 
   bool useEGPhotons_;
-  
-  /// use SuperClusters ? 
-  bool useSuperClusters_;  
   
   /// switch on/off Conversions
   bool  useConversions_;  
@@ -95,6 +91,10 @@ class PFBlockProducer : public edm::EDProducer {
 
   /// Particle flow block algorithm 
   PFBlockAlgo            pfBlockAlgo_;
+
+  /// Switch to use methods suitable for re-reco from AOD
+  bool runOnAOD_;
+
 
 };
 

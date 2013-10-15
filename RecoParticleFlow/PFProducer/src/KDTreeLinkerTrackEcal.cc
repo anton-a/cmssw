@@ -29,7 +29,7 @@ KDTreeLinkerTrackEcal::insertFieldClusterElt(reco::PFBlockElement	*ecalCluster)
   // 	(clusterref->layer() == PFLayer::ECAL_BARREL)))
   //     return;
 
-  const std::vector<reco::PFRecHitFraction> &fraction = clusterref->recHitFractions();
+  const std::vector<reco::PFRecHitFraction> &fraction = *clusterref->recHitFractions();
 
   // We create a list of ecalCluster
   fieldClusterSet_.insert(ecalCluster);
@@ -157,7 +157,7 @@ KDTreeLinkerTrackEcal::searchLinks()
 	
 	reco::PFClusterRef clusterref = (*clusterIt)->clusterRef();
 	double clusterz = clusterref->position().Z();
-	int fracsNbr = clusterref->recHitFractions().size();
+	int fracsNbr = clusterref->recHitFractions()->size();
 
 	if (clusterref->layer() == PFLayer::ECAL_BARREL){ // BARREL
 	  // Check if the track is in the barrel

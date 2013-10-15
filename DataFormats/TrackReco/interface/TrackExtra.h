@@ -9,7 +9,7 @@
  *
  * \author Luca Lista, INFN
  *
- * \version $Id: TrackExtra.h,v 1.29 2010/07/12 08:51:10 hegner Exp $
+ * \version $Id: TrackExtra.h,v 1.30.6.1 2013/05/01 15:11:27 anastass Exp $
  *
  */
 #include <Rtypes.h>
@@ -38,12 +38,13 @@ namespace reco {
     typedef unsigned int index;
 
     /// default constructor
+    // remove the moved members (AA)
     TrackExtra(): 
-      outerMomentum_(),
+ //     outerMomentum_(),
       outerOk_(false),
       outerDetId_(0),
-      innerPosition_(),
-      innerMomentum_(),
+ //     innerPosition_(),
+ //     innerMomentum_(),
       innerOk_(false),
       innerDetId_(0),
       seedDir_(anyDirection),
@@ -61,25 +62,38 @@ namespace reco {
    }
 
     /// constructor from outermost/innermost position and momentum and Seed information
-    TrackExtra( const Point & outerPosition, const Vector & outerMomentum, bool ok ,
-		const Point & innerPosition, const Vector & innerMomentum, bool iok,
-		const CovarianceMatrix& outerState, unsigned int outerId,
-		const CovarianceMatrix& innerState, unsigned int innerId, 
-		PropagationDirection seedDir, 
-		edm::RefToBase<TrajectorySeed>  seedRef=edm::RefToBase<TrajectorySeed>());
+//    TrackExtra( const Point & outerPosition, const Vector & outerMomentum, bool ok ,
+//		const Point & innerPosition, const Vector & innerMomentum, bool iok,
+//		const CovarianceMatrix& outerState, unsigned int outerId,
+//		const CovarianceMatrix& innerState, unsigned int innerId, 
+//		PropagationDirection seedDir, 
+//		edm::RefToBase<TrajectorySeed>  seedRef=edm::RefToBase<TrajectorySeed>());
+    // remove the migrated members (AA)
+    TrackExtra(bool outerOk,
+    bool innerOk,
+    const CovarianceMatrix& outerState, unsigned int outerId,
+    const CovarianceMatrix& innerState, unsigned int innerId, 
+    PropagationDirection seedDir, 
+    edm::RefToBase<TrajectorySeed>  seedRef=edm::RefToBase<TrajectorySeed>()); 
 
+// remove migrated accessors (AA)
+/*
     /// outermost hit position
     const Point & outerPosition() const { return outerPosition_; }
     /// momentum vector at outermost hit position
     const Vector & outerMomentum() const { return outerMomentum_; }
+*/ 
     /// returns true if the outermost hit is valid
     bool outerOk() const { return outerOk_; }
+/*
     /// innermost hit position
     const Point & innerPosition() const { return innerPosition_; }
     /// momentum vector at innermost hit position
     const Vector & innerMomentum() const { return innerMomentum_; }
+*/
     /// returns true if the innermost hit is valid
     bool innerOk() const { return innerOk_; }
+/*
     /// x coordinate of momentum vector at the outermost hit position    
     double outerPx() const { return outerMomentum_.X(); }
     /// y coordinate of momentum vector at the outermost hit position
@@ -104,7 +118,7 @@ namespace reco {
     double outerTheta() const { return outerMomentum().Theta(); }
     /// polar radius of the outermost hit position
     double outerRadius() const { return outerPosition().Rho(); }
-
+*/
     /// outermost trajectory state curvilinear errors
     CovarianceMatrix outerStateCovariance() const;
     /// innermost trajectory state curvilinear errors
@@ -134,22 +148,25 @@ namespace reco {
     const TrackResiduals &residuals () const { return trackResiduals_; }
 
   private:
-
+    // Remove members moved to track (AA)
+/*
     /// outermost hit position
     Point outerPosition_;
     /// momentum vector at outermost hit position
     Vector outerMomentum_;
+*/
     /// outermost hit validity flag
     bool outerOk_;
     /// outermost trajectory state curvilinear errors 
     float outerCovariance_[ covarianceSize ];
     unsigned int outerDetId_;
 
-
+/*
     /// innermost hit position
     Point innerPosition_;
     /// momentum vector at innermost hit position
     Vector innerMomentum_;
+*/
     /// innermost hit validity flag
     bool innerOk_;
     /// innermost trajectory state 

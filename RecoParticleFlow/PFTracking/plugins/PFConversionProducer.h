@@ -26,8 +26,8 @@ private:
   
   ///PFTrackTransformer
   PFTrackTransformer *pfTransformer_; 
-  edm::InputTag pfConversionContainer_;
-  edm::InputTag pfTrackContainer_;
-  edm::InputTag vtx_h;
+  edm::InputTag inputConversionsTag_;
+//  edm::InputTag inputTracksTag_;  // neither general tracks (nor any other track coll) is directly used (AA)
+  edm::InputTag inputVerticesTag_;
 };
 #endif

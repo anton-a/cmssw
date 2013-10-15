@@ -39,7 +39,7 @@ KDTreeLinkerPSEcal::insertFieldClusterElt(reco::PFBlockElement	*ecalCluster)
   if (clusterref->layer() != PFLayer::ECAL_ENDCAP)
     return;
 	  
-  const std::vector<reco::PFRecHitFraction> &fraction = clusterref->recHitFractions();
+  const std::vector<reco::PFRecHitFraction> &fraction = *clusterref->recHitFractions();
 
   // We create a list of cluster
   fieldClusterSet_.insert(ecalCluster);

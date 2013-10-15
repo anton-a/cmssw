@@ -23,7 +23,8 @@ void PFHcalSuperClusterInit::initialize( PFSuperCluster & supercluster,  edm::Pt
   for (unsigned short ic=0; ic<clusters.size();++ic) {
 //    const std::vector< std::pair<DetId, float> > & hitsandfracs =
 //          clusters[ic].hitsAndFractions();
-    const std::vector< reco::PFRecHitFraction >& pfhitsandfracs = clusters[ic]->recHitFractions();
+    // for modified PFCluster (AA)
+    const std::vector< reco::PFRecHitFraction >& pfhitsandfracs = *clusters[ic]->recHitFractions();
     double clusterEnergy = clusters[ic]->energy();
     superClusterEnergy+=clusterEnergy;
     if (clusterEnergy>=maxClusterEnergy) {
@@ -77,8 +78,8 @@ void PFHcalSuperClusterInit::initialize( PFSuperCluster & supercluster,  edm::Pt
   double posPhi = 0.0;
   double posRho = 1.0;
   double w0_ = 4.2;
-  if (superClusterEnergy>0.0 && supercluster.recHitFractions().size()>0) {
-    const std::vector <reco::PFRecHitFraction >& pfhitsandfracs = supercluster.recHitFractions();
+  if (superClusterEnergy>0.0 && (*supercluster.recHitFractions()).size()>0) {
+    const std::vector <reco::PFRecHitFraction >& pfhitsandfracs = *supercluster.recHitFractions();
     for (std::vector<reco::PFRecHitFraction>::const_iterator it = pfhitsandfracs.begin(); it != pfhitsandfracs.end(); ++it) {
       const reco::PFRecHitRef rechit = it->recHitRef();
       double hitEta = rechit->positionREP().Eta();

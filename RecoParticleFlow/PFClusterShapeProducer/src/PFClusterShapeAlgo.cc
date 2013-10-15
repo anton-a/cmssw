@@ -98,7 +98,7 @@ void PFClusterShapeAlgo::find_eMax_e2nd()
   std::map<double, DetId> energyMap;
 
   // First get the RecHitFractions:
-  const std::vector<reco::PFRecHitFraction> & fraction_v = currentCluster_p->recHitFractions();
+  const std::vector<reco::PFRecHitFraction> & fraction_v = *currentCluster_p->recHitFractions();
   // For every one of them...
   for (std::vector<reco::PFRecHitFraction>::const_iterator it = fraction_v.begin(); it != fraction_v.end(); ++it)
     {
@@ -136,7 +136,7 @@ int PFClusterShapeAlgo::findPFRHIndexFromDetId(unsigned int id)
 
 const reco::PFRecHitFraction * PFClusterShapeAlgo::getFractionFromDetId(const DetId & id)
 {
-  const std::vector< reco::PFRecHitFraction > & fraction_v = currentCluster_p->recHitFractions();
+  const std::vector< reco::PFRecHitFraction > & fraction_v = *currentCluster_p->recHitFractions();
   for (std::vector<reco::PFRecHitFraction>::const_iterator it = fraction_v.begin(); it != fraction_v.end(); ++it)
     {
       //const unsigned int rhIndex = it->recHitIndex();

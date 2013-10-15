@@ -248,8 +248,8 @@ void DuplicateListMerger::produce(edm::Event& iEvent, const edm::EventSetup& iSe
       }//creating a new seed and rekeying it rechit clusters.
       // Fill TrackExtra collection
       outputTrkExtras->push_back( reco::TrackExtra( 
-						   track.outerPosition(), track.outerMomentum(), track.outerOk(),
-						   track.innerPosition(), track.innerMomentum(), track.innerOk(),
+						   track.outerOk(),
+						   track.innerOk(),
 						   track.outerStateCovariance(), track.outerDetId(),
 						   track.innerStateCovariance(), track.innerDetId(),
 						   track.seedDirection(), origSeedRef ) );
@@ -346,8 +346,8 @@ void DuplicateListMerger::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	
 	// Fill TrackExtra collection
 	outputTrkExtras->push_back( reco::TrackExtra( 
-						     track.outerPosition(), track.outerMomentum(), track.outerOk(),
-						     track.innerPosition(), track.innerMomentum(), track.innerOk(),
+						     track.outerOk(),
+						     track.innerOk(),
 						     track.outerStateCovariance(), track.outerDetId(),
 						     track.innerStateCovariance(), track.innerDetId(),
 						     track.seedDirection(), origSeedRef ) );

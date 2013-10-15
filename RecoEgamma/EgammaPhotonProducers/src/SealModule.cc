@@ -11,6 +11,8 @@
 #include "RecoEgamma/EgammaPhotonProducers/interface/ConversionTrackMerger.h"
 #include "RecoEgamma/EgammaPhotonProducers/interface/GEDPhotonCoreProducer.h"
 #include "RecoEgamma/EgammaPhotonProducers/interface/GEDPhotonProducer.h"
+#include "RecoEgamma/EgammaPhotonProducers/interface/ConversionCleanerForPF.h"
+
 
 DEFINE_FWK_MODULE(PhotonCoreProducer);
 DEFINE_FWK_MODULE(PhotonProducer);
@@ -22,3 +24,4 @@ DEFINE_FWK_MODULE(ConversionTrackProducer);
 DEFINE_FWK_MODULE(ConversionTrackMerger);
 DEFINE_FWK_MODULE(GEDPhotonCoreProducer);
 DEFINE_FWK_MODULE(GEDPhotonProducer);
+DEFINE_FWK_MODULE(ConversionCleanerForPF);

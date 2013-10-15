@@ -25,7 +25,7 @@ void PFPhotonClusters::SetSeed(){
   math::XYZVector position;
   DetId idseed;
   const std::vector< reco::PFRecHitFraction >& PFRecHits=
-    PFClusterRef_->recHitFractions();
+    *PFClusterRef_->recHitFractions();
   
   for(std::vector< reco::PFRecHitFraction >::const_iterator it = PFRecHits.begin();
       it != PFRecHits.end(); ++it){
@@ -125,7 +125,7 @@ void PFPhotonClusters::PFCrystalCoor(){
 }
 
 void PFPhotonClusters::FillClusterShape(){
-  const std::vector< reco::PFRecHitFraction >& PFRecHits=PFClusterRef_->recHitFractions();  
+  const std::vector<reco::PFRecHitFraction>& PFRecHits = *PFClusterRef_->recHitFractions();  
   for(std::vector< reco::PFRecHitFraction >::const_iterator it = PFRecHits.begin(); it != PFRecHits.end(); ++it){
     const PFRecHitRef& RefPFRecHit = it->recHitRef();
     DetId id=RefPFRecHit->detId();
@@ -200,7 +200,8 @@ void PFPhotonClusters::FillClusterWidth(){
   double numeratorEtaPhiWidth = 0.;
   double ClustEta=PFClusterRef_->eta();
   double ClustPhi=PFClusterRef_->phi();
-  const std::vector< reco::PFRecHitFraction >& PFRecHits=PFClusterRef_->recHitFractions();  
+  const std::vector< reco::PFRecHitFraction >& PFRecHits = *PFClusterRef_->recHitFractions();  
+  
   for(std::vector< reco::PFRecHitFraction >::const_iterator it = PFRecHits.begin(); it != PFRecHits.end(); ++it){
     const PFRecHitRef& RefPFRecHit = it->recHitRef();  
     float E=RefPFRecHit->energy() * it->fraction();
