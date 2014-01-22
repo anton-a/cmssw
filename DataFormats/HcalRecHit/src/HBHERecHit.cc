@@ -6,7 +6,8 @@ HBHERecHit::HBHERecHit() : CaloRecHit() {
 
 HBHERecHit::HBHERecHit(const HcalDetId& id, float energy, float timeRising, float timeFalling) :
   CaloRecHit(id,energy,timeRising),
-  timeFalling_(timeFalling)	
+  timeFalling_(timeFalling),
+  timeADC_(-999.)	
 {
 }
 
