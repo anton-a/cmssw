@@ -10,9 +10,10 @@
 
 
 
-HcalElectronicsSim::HcalElectronicsSim(HcalAmplifier * amplifier, const HcalCoderFactory * coderFactory)
+HcalElectronicsSim::HcalElectronicsSim(HcalAmplifier * amplifier, const HcalCoderFactory * coderFactory, unsigned int tdcDAC)
   : theAmplifier(amplifier),
     theCoderFactory(coderFactory),
+    theTDC(tdcDAC),
     theRandFlat(0),
     theStartingCapId(0),
     theStartingCapIdIsRandom(true)
@@ -88,4 +89,9 @@ void HcalElectronicsSim::setStartingCapId(int startingCapId)
   // turns off random capIDs forever for this instance
   theStartingCapIdIsRandom = false;
 }
+
+void HcalElectronicsSim::setTDCDAC(unsigned int tdcDAC) {
+  theTDC.setThresholdDAC(tdcDAC);
+}
+
 
