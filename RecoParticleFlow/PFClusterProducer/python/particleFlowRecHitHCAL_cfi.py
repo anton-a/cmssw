@@ -1,12 +1,13 @@
 import FWCore.ParameterSet.Config as cms
 
-particleFlowRecHitHCAL = cms.EDProducer("PFRecHitProducerHCAL",
+particleFlowRecHitHCAL = cms.EDProducer("PFHCALDualTimeRecHitProducer",
     # verbosity 
     verbose = cms.untracked.bool(False),
     caloTowers = cms.InputTag("towerMakerPF"),
-    hcalRecHitsHBHE = cms.InputTag("hbhereco"),
-    hcalRecHitsHF = cms.InputTag("hfreco"),
-    # cell threshold in barrel 
+###    hcalRecHitsHBHE = cms.InputTag("hbhereco"),
+    hcalRecHitsHBHE = cms.InputTag("hbheUpgradeReco"),
+    hcalRecHitsHF = cms.InputTag("hfreco"), 
+   # cell threshold in barrel 
     thresh_Barrel = cms.double(0.4),
     # cell threshold in HF
     thresh_HF = cms.double(0.4),
