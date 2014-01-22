@@ -48,6 +48,7 @@ private:
   int thePixels;
   bool theSiPMSmearing;
   bool doTimeSmear_;
+  unsigned int tdcDAC_;
   HcalTimeSmearSettings theSmearSettings;
 };
 
