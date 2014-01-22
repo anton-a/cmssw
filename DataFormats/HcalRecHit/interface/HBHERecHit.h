@@ -22,6 +22,12 @@ public:
   /// get the amplitude (generally fC, but can vary)
   /// get the hit time
   float timeFalling() const { return timeFalling_; }
+
+  // for adc based time determination in the upgrade
+  float timeADC() const { return timeADC_; }
+  void setTimeADC( float t ) { timeADC_ = t; }
+
+
   HcalDetId id() const { return HcalDetId(detid()); }
 
 
@@ -29,6 +35,7 @@ public:
 private:
 
   float timeFalling_;
+  float timeADC_;
 };
 
 std::ostream& operator<<(std::ostream& s, const HBHERecHit& hit);
