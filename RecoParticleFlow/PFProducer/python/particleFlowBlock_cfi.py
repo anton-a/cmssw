@@ -12,10 +12,10 @@ particleFlowBlock = cms.EDProducer("PFBlockProducer",
 
     # input clusters
     PFClustersECAL = cms.InputTag("particleFlowClusterECAL"),
-    PFClustersHCAL = cms.InputTag("particleFlowClusterHCAL"),
-    PFClustersHO = cms.InputTag("particleFlowClusterHO"),	
+#    PFClustersHCAL = cms.InputTag("particleFlowClusterHCAL"),
     # For upgrade studies:
-#    PFClustersHCAL = cms.InputTag("particleFlowHCALSuperClusterDualTime"),
+    PFClustersHCAL = cms.InputTag("particleFlowHCALSuperClusterDualTime"),
+    PFClustersHO = cms.InputTag("particleFlowClusterHO"),	
     PFClustersHFEM = cms.InputTag("particleFlowClusterHFEM"),
     PFClustersHFHAD = cms.InputTag("particleFlowClusterHFHAD"),
     PFClustersPS = cms.InputTag("particleFlowClusterPS"),
