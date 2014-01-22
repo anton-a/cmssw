@@ -21,7 +21,8 @@ class HcalCoderFactory;
 class HcalElectronicsSim {
 public:
   HcalElectronicsSim(HcalAmplifier * amplifier, 
-                     const HcalCoderFactory * coderFactory);
+                     const HcalCoderFactory * coderFactory,
+                     unsigned int tdcDAC = 12);
   ~HcalElectronicsSim();
 
   void setRandomEngine(CLHEP::HepRandomEngine & engine);
@@ -36,6 +37,8 @@ public:
   /// sets starting CapID randomly
   void newEvent();
   void setStartingCapId(int startingCapId);
+
+  void setTDCDAC(unsigned int tdcDAC);
 
 private:
   template<class Digi> void convert(CaloSamples & frame, Digi & result);
