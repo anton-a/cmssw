@@ -18,10 +18,12 @@ void HcalTDCReco::reconstruct(const HcalUpgradeDataFrame & digi,
   int i(signalBX);
 
   // for(int i = 3; i < n; ++i)
-  while ((i > 2) && (i < 8) && (i < n) && 
+  while ((stepSize <= n) &&  
 	 ((risingTime < -998.) || (fallingTime < 998.)))
   {
-    unsigned tdc = digi.tdc(i);
+    unsigned tdc(6363);
+    if ((i>=0) and (i<n))
+      tdc = digi.tdc(i);
 
     /* 
     unsigned rising = tdc & 0x7F;
