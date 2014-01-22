@@ -10,7 +10,7 @@ particleFlowClusterHCAL = cms.EDProducer("PFClusterProducer",
     thresh_Seed_Barrel = cms.double(0.8),
     thresh_Pt_Seed_Barrel = cms.double(0.0),
     # cell threshold in HCAL barrel 
-    thresh_Barrel = cms.double(0.8),
+    thresh_Barrel = cms.double(0.4),
     thresh_Pt_Barrel = cms.double(0.0),
     # cleaning threshold and minimum S4/S1 fraction in HCAL barrel
     # thresh_Clean_Barrel = cms.double(35.0),
@@ -40,7 +40,7 @@ particleFlowClusterHCAL = cms.EDProducer("PFClusterProducer",
     # use cells with common corner to build topo-clusters
     useCornerCells = cms.bool(True),
     # enable cleaning of RBX and HPD (HCAL only);                                         
-    cleanRBXandHPDs = cms.bool(True),
+    cleanRBXandHPDs = cms.bool(False),
     # n crystals for position calculation in HCAL
     posCalcNCrystal = cms.int32(5), 
     #----depth correction
