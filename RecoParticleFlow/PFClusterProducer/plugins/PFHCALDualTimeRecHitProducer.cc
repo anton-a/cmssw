@@ -38,6 +38,10 @@
 using namespace std;
 using namespace edm;
 
+// temporary helper function
+double timeCorr(double e, HcalSubdetector sd, int depth );
+
+
 PFHCALDualTimeRecHitProducer::PFHCALDualTimeRecHitProducer(const edm::ParameterSet& iConfig)
   : PFRecHitProducer( iConfig ) 
 {
@@ -222,36 +226,47 @@ void PFHCALDualTimeRecHitProducer::createRecHits(vector<reco::PFRecHit>& rechits
       for(unsigned irechit=0; irechit<hbheHandle->size(); irechit++) {
         const HBHERecHit& hit = (*hbheHandle)[irechit];
 
-
         double hitenergy = hit.energy();
 	double hittime = hit.time();
 
         reco::PFRecHit* pfrh = 0;
         reco::PFRecHit* pfrhCleaned = 0;
 
-
         const HcalDetId& detid = hit.detid();
+
+
+        bool noTimeCut = false; // later set as config parameter (AA)
+
+
+
+
+	    // modify the timing linearization and windows (AA)
+		// explore options to keep or reject hits with no timing information
+      
+    if (!noTimeCut) {
+  	 	if (hittime> -100) hittime -= timeCorr(hitenergy, detid.subdet(), detid.depth() );
+      else hittime = 0; // accept hits without timing (compare both options) 
+    }
+
         switch( detid.subdet() ) {
         case HcalBarrel:
           {
-            if(hitenergy < thresh_Barrel_ ) continue;
-            if(detid.depth()==1) {
-              hittime -= 48.9580/(2.16078+hitenergy);
-            } else if(detid.depth()==2) {
-              hittime -= 34.2860/(1.23746+hitenergy);
-            } else if(detid.depth()==3) {
-              hittime -= 38.6872/(1.48051+hitenergy);
-            }
-// time window for signal=4
-            if(    (detid.depth()==1 && hittime>-20 && hittime<5) 
-                || (detid.depth()==2 && hittime>-17 && hittime<8) 
-                || (detid.depth()==3 && hittime>-15 && hittime<10) 
+            if(hitenergy < thresh_Barrel_ )  continue;
+            
+
+// modified timing windows - start with naive ones(AA) 
+            if(    (detid.depth()==1 && hittime>-13 && hittime<12) 
+                || (detid.depth()==2 && hittime>-13 && hittime<12) 
+                || (detid.depth()==3 && hittime>-13 && hittime<12) 
+                || noTimeCut
               ) {
               pfrh = createHcalRecHit( detid,
                                        hitenergy,
                                        PFLayer::HCAL_BARREL1,
                                        hcalBarrelGeometry );
-	      pfrh->setRescale(hittime);
+									   
+              // we should set a proper container for the time in PFRecHit (AA)
+			       pfrh->setRescale(hittime);
             }
           }
           break;
@@ -260,29 +275,21 @@ void PFHCALDualTimeRecHitProducer::createRecHits(vector<reco::PFRecHit>& rechits
             if(hitenergy < thresh_Endcap_ ) continue;
             // Apply tower 29 calibration
             if ( HCAL_Calib_ && abs(detid.ieta()) == 29 ) hitenergy *= HCAL_Calib_29;
-            if(detid.depth()==1) {
-              hittime -= 60.8050/(3.07285+hitenergy);
-            } else if(detid.depth()==2) {
-              hittime -= 47.1677/(2.06485+hitenergy);
-            } else if(detid.depth()==3) {
-              hittime -= 37.1941/(1.53790+hitenergy);
-            } else if(detid.depth()==4) {
-              hittime -= 42.9898/(1.92969+hitenergy);
-            } else if(detid.depth()==5) {
-              hittime -= 48.3157/(2.29903+hitenergy);
-            }
-// time window for signal=4
-            if(    (detid.depth()==1 && hittime>-20 && hittime<5) 
-                || (detid.depth()==2 && hittime>-19 && hittime<6) 
-                || (detid.depth()==3 && hittime>-18 && hittime<7) 
-                || (detid.depth()==4 && hittime>-17 && hittime<8) 
-                || (detid.depth()==5 && hittime>-15 && hittime<10) 
+
+// modified timing windows - start with naive ones(AA)
+            if(    (detid.depth()==1 && hittime>-13 && hittime<12) 
+                || (detid.depth()==2 && hittime>-13 && hittime<12) 
+                || (detid.depth()==3 && hittime>-13 && hittime<12) 
+                || (detid.depth()==4 && hittime>-13 && hittime<12) 
+                || (detid.depth()==5 && hittime>-13 && hittime<12) 
+                || noTimeCut
               ) {
               pfrh = createHcalRecHit( detid,
                                        hitenergy,
                                        PFLayer::HCAL_ENDCAP,
                                        hcalEndcapGeometry );
-	      pfrh->setRescale(hittime);
+              // see comment above (AA)
+			       pfrh->setRescale(hittime);
             }
           }
           break;
@@ -298,6 +305,7 @@ void PFHCALDualTimeRecHitProducer::createRecHits(vector<reco::PFRecHit>& rechits
           idSortedRecHits.insert( make_pair(detid.rawId(),
                                             rechits.size()-1 ) );
         }
+
         if(pfrhCleaned) { 
           rechitsCleaned.push_back( *pfrhCleaned );
           delete pfrhCleaned;
@@ -1516,4 +1524,87 @@ PFHCALDualTimeRecHitProducer::getNorth(const DetId& id,
   return north;
 } 
 
+// temporary, just for testing (AA)
+double timeCorr(double e, HcalSubdetector sd, int depth ) {
+   
+   // avoid unkown behavior at large energies
+   if (e > 40.0) e = 40;
+   
+   double corr = 0.0;
+   double p0 = 0.0;
+   double p1 = 0.0;
+   double p2 = 0.0;
+   double p3 = 0.0;
+   double p4 = 0.0;
+   
+   if (sd==HcalBarrel) {
+      switch (depth) {
+      case 1: 
+      p0 =         3.28587e+000;
+      p1 =        -6.75780e-001;
+      p2 =         7.33208e+000;
+      p3 =        -1.60925e-001;
+      p4 =         1.58950e-003;
+      break;
+      case 2:
+      p0 =          3.18140e+000;
+      p1 =        -6.35764e-001;
+      p2 =         6.84248e+000;
+      p3 =        -1.77508e-001;
+      p4 =         1.86179e-003;
+      break;
+      case 3:
+      p0 =         3.25434e+000;
+      p1 =        -6.62655e-001;
+      p2 =         6.03523e+000;
+      p3 =        -2.58276e-001;
+      p4 =         3.86700e-003;
+      break;
+      }
+   }
+   else if (sd==HcalEndcap) {
+      switch (depth) {
+      case 1:
+      p0 =         3.44969e+000;
+      p1 =        -7.74797e-001;
+      p2 =         7.07454e+000;
+      p3 =        -1.75267e-001;
+      p4 =         2.08585e-003;
+      break;
+      case 2:
+      p0 =          3.42694e+000;
+      p1 =        -7.38052e-001;
+      p2 =         7.32696e+000;
+      p3 =        -2.14835e-001;
+      p4 =         2.98468e-003;
+      break;
+      case 3: 
+      p0 =         3.44122e+000;
+      p1 =        -7.32644e-001;
+      p2 =         6.68813e+000;
+      p3 =        -2.13227e-001;
+      p4 =         2.89048e-003;
+      break;
+      case 4: 
+      p0 =         3.44769e+000;
+      p1 =        -7.36780e-001;
+      p2 =         5.77368e+000;
+      p3 =        -2.06017e-001;
+      p4 =         2.72580e-003;
+      break;
+      case 5:
+      p0 =         3.45880e+000;
+      p1 =        -7.49052e-001;
+      p2 =         4.39402e+000;
+      p3 =        -2.16175e-001;
+      p4 =         2.65140e-003;
+      break;
+      }
+   }
+   else return corr;
+   
+   corr = exp(p0+p1*e) + p2 + p3*e +p4*e*e;
+   
+   return corr;
 
+}
