@@ -21,7 +21,8 @@ HcalSimParameters::HcalSimParameters(double simHitToPhotoelectrons, const std::v
   thePE2fCByRing(photoelectronsToAnalog),
   thePixels(0),
   theSiPMSmearing(false),
-  doTimeSmear_(true)
+  doTimeSmear_(true),
+  tdcDAC_(12)
 {
   defaultTimeSmearing();
 }
@@ -32,8 +33,9 @@ HcalSimParameters::HcalSimParameters(const edm::ParameterSet & p)
    theFirstRing( p.getParameter<int>("firstRing") ),
    theSamplingFactors( p.getParameter<std::vector<double> >("samplingFactors") ),
    thePE2fCByRing( p.getParameter<std::vector<double> >("photoelectronsToAnalog") ),
-   thePixels(0), theSiPMSmearing(false),
-   doTimeSmear_( p.getParameter<bool>("timeSmearing"))
+   thePixels(0), theSiPMSmearing(false), 
+   doTimeSmear_( p.getParameter<bool>("timeSmearing")),
+   tdcDAC_(12)
 {
   if(p.exists("pixels"))
   {
@@ -41,6 +43,10 @@ HcalSimParameters::HcalSimParameters(const edm::ParameterSet & p)
   }
   if (p.exists("doSiPMSmearing"))
     theSiPMSmearing = p.getParameter<bool>("doSiPMSmearing");
+
+  if (p.exists("TDCDAC"))
+    tdcDAC_ = p.getParameter<unsigned int>("TDCDAC");
+
   defaultTimeSmearing();
 }
 
