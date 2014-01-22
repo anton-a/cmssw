@@ -16,7 +16,8 @@ hcalSimParameters = cms.PSet(
         photoelectronsToAnalog = cms.double(2.79),
         simHitToPhotoelectrons = cms.double(6.0),
         syncPhase = cms.bool(True),
-        timePhase = cms.double(14.0)        
+        timePhase = cms.double(14.0),        
+        TDCDAC = cms.uint32(12)
     ),
     hf2 = cms.PSet(
         readoutFrameSize = cms.int32(5),
@@ -26,7 +27,8 @@ hcalSimParameters = cms.PSet(
         photoelectronsToAnalog = cms.double(1.843),
         simHitToPhotoelectrons = cms.double(6.0),
         syncPhase = cms.bool(True),
-        timePhase = cms.double(13.0)
+        timePhase = cms.double(13.0),
+        TDCDAC = cms.uint32(12)
     ),
     ho = cms.PSet(
         readoutFrameSize = cms.int32(10),
@@ -62,7 +64,8 @@ hcalSimParameters = cms.PSet(
         timePhase = cms.double(6.0),
         timeSmearing = cms.bool(True),
         siPMCells = cms.vint32(),
-        doSiPMSmearing = cms.bool(True)
+        doSiPMSmearing = cms.bool(True),
+        TDCDAC = cms.uint32(12)
     ),
     he = cms.PSet(
         readoutFrameSize = cms.int32(10),
@@ -78,7 +81,8 @@ hcalSimParameters = cms.PSet(
         syncPhase = cms.bool(True),
         timePhase = cms.double(6.0),
         timeSmearing = cms.bool(True),
-        doSiPMSmearing = cms.bool(True)
+        doSiPMSmearing = cms.bool(True),
+        TDCDAC = cms.uint32(12)
     ),
     zdc = cms.PSet(
         readoutFrameSize = cms.int32(10),
