@@ -173,8 +173,9 @@ HcalDigitizer::HcalDigitizer(const edm::ParameterSet& ps) :
   theHFElectronicsSim = new HcalElectronicsSim(theHFAmplifier, theCoderFactory);
   theHOElectronicsSim = new HcalElectronicsSim(theHOAmplifier, theCoderFactory);
   theZDCElectronicsSim = new HcalElectronicsSim(theZDCAmplifier, theCoderFactory);
-  theUpgradeHBHEElectronicsSim = new HcalElectronicsSim(theHBHEAmplifier, theUpgradeCoderFactory);
-  theUpgradeHFElectronicsSim = new HcalElectronicsSim(theHFAmplifier, theUpgradeCoderFactory);
+  theUpgradeHBHEElectronicsSim = new HcalElectronicsSim(theHBHEAmplifier, theUpgradeCoderFactory, ps.getParameter<edm::ParameterSet>("hb").getParameter<unsigned int>("TDCDAC"));
+  theUpgradeHFElectronicsSim = new HcalElectronicsSim(theHFAmplifier, theUpgradeCoderFactory, ps.getParameter<edm::ParameterSet>("hf1").getParameter<unsigned int>("TDCDAC"));
+
 
   //  std::cout << "HcalDigitizer: theUpgradeElectronicsSim created" <<  std::endl; 
 
