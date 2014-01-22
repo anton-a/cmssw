@@ -197,7 +197,9 @@ HBHERecHit HcalSimpleRecAlgo::reconstruct(const HBHEDataFrame& digi, int first, 
 HBHERecHit HcalSimpleRecAlgo::reconstructHBHEUpgrade(const HcalUpgradeDataFrame& digi, int first, int toadd, const HcalCoder& coder, const HcalCalibrations& calibs) const {
   HBHERecHit result = HcalSimpleRecAlgoImpl::reco<HcalUpgradeDataFrame,HBHERecHit>( digi, coder, calibs, first, toadd, correctForTimeslew_, correctForPulse_, pulseCorr_->get(digi.id(), toadd, phaseNS_), HcalTimeSlew::Medium, false, false);
   HcalTDCReco tdcReco;
+  float adcTime(result.time());
   tdcReco.reconstruct(digi, result);
+  result.setTimeADC(adcTime);
   return result;
 }
 
