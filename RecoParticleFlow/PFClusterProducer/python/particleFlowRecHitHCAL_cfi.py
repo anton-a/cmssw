@@ -8,11 +8,11 @@ particleFlowRecHitHCAL = cms.EDProducer("PFHCALDualTimeRecHitProducer",
     hcalRecHitsHBHE = cms.InputTag("hbheUpgradeReco"),
     hcalRecHitsHF = cms.InputTag("hfreco"), 
    # cell threshold in barrel 
-    thresh_Barrel = cms.double(0.4),
+    thresh_Barrel = cms.double(0.1),
     # cell threshold in HF
     thresh_HF = cms.double(0.4),
     # cell threshold in endcap 
-    thresh_Endcap = cms.double(0.4),
+    thresh_Endcap = cms.double(0.1),
     # Navigation in HF: 
     # False = no real clustering in HF
     # True  = do clustering in HF

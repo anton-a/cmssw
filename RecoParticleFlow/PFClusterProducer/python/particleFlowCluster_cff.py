@@ -26,7 +26,7 @@ pfClusteringHO = cms.Sequence(particleFlowRecHitHO*particleFlowClusterHO)
 
 #pfClusteringHCAL = cms.Sequence(particleFlowRecHitHCAL*particleFlowClusterHCAL*particleFlowClusterHFHAD*particleFlowClusterHFEM)
 pfClusteringPS = cms.Sequence(particleFlowRecHitPS*particleFlowClusterPS)
-pfClusteringSC = cms.Sequence(particleFlowRecHitHCAL*particleFlowHCALSuperClusterDualTime)
+pfClusteringSC = cms.Sequence(particleFlowHCALSuperClusterDualTime)
 
 towerMakerPF = calotowermaker.clone()
 
@@ -80,6 +80,9 @@ towerMakerPF.UseHcalRecoveredHits = True
 # flag to allow/disallow missing inputs
 towerMakerPF.AllowMissingInputs = False
 
+# for better consistency, the sequences should be modified so that
+# HO clustering (when needed) is in the HCAL sequence
+ 
 particleFlowClusterWithoutHO = cms.Sequence(
     #caloTowersRec*
     towerMakerPF*
@@ -92,9 +95,10 @@ particleFlowCluster = cms.Sequence(
     #caloTowersRec*
     towerMakerPF*
     pfClusteringECAL*
+    pfClusteringPS*
     pfClusteringHCAL*
     pfClusteringHO*
-    pfClusteringPS*
+# superclustering in HB/HE (HCAL)  
     pfClusteringSC
 )
 
