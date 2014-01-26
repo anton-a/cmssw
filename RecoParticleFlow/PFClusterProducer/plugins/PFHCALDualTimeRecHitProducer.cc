@@ -34,13 +34,11 @@
 
 #include "RecoLocalCalo/HcalRecAlgos/interface/HcalCaloFlagLabels.h"
 
+// to get the time corrections
+#include "RecoParticleFlow/PFClusterProducer/interface/PFRecHitTimeCorrHBHE.h"
 
 using namespace std;
 using namespace edm;
-
-// temporary helper function
-double timeCorr(double e, HcalSubdetector sd, int depth );
-
 
 PFHCALDualTimeRecHitProducer::PFHCALDualTimeRecHitProducer(const edm::ParameterSet& iConfig)
   : PFRecHitProducer( iConfig ) 
@@ -240,11 +238,13 @@ void PFHCALDualTimeRecHitProducer::createRecHits(vector<reco::PFRecHit>& rechits
 
 
 
-	    // modify the timing linearization and windows (AA)
+	  // modify the timing linearization and windows (AA)
 		// explore options to keep or reject hits with no timing information
       
     if (!noTimeCut) {
-  	 	if (hittime> -100) hittime -= timeCorr(hitenergy, detid.subdet(), detid.depth() );
+  	 	if (hittime> -200) hittime = (detid.subdet()==HcalBarrel)?
+                         PFRecHitTimeCorr::tdcCorrHB(hittime, hitenergy, detid.depth()) :
+                         PFRecHitTimeCorr::tdcCorrHE(hittime, hitenergy, detid.depth());
       else hittime = 0; // accept hits without timing (compare both options) 
     }
 
@@ -1523,88 +1523,3 @@ PFHCALDualTimeRecHitProducer::getNorth(const DetId& id,
   
   return north;
 } 
-
-// temporary, just for testing (AA)
-double timeCorr(double e, HcalSubdetector sd, int depth ) {
-   
-   // avoid unkown behavior at large energies
-   if (e > 40.0) e = 40;
-   
-   double corr = 0.0;
-   double p0 = 0.0;
-   double p1 = 0.0;
-   double p2 = 0.0;
-   double p3 = 0.0;
-   double p4 = 0.0;
-   
-   if (sd==HcalBarrel) {
-      switch (depth) {
-      case 1: 
-      p0 =         3.28587e+000;
-      p1 =        -6.75780e-001;
-      p2 =         7.33208e+000;
-      p3 =        -1.60925e-001;
-      p4 =         1.58950e-003;
-      break;
-      case 2:
-      p0 =          3.18140e+000;
-      p1 =        -6.35764e-001;
-      p2 =         6.84248e+000;
-      p3 =        -1.77508e-001;
-      p4 =         1.86179e-003;
-      break;
-      case 3:
-      p0 =         3.25434e+000;
-      p1 =        -6.62655e-001;
-      p2 =         6.03523e+000;
-      p3 =        -2.58276e-001;
-      p4 =         3.86700e-003;
-      break;
-      }
-   }
-   else if (sd==HcalEndcap) {
-      switch (depth) {
-      case 1:
-      p0 =         3.44969e+000;
-      p1 =        -7.74797e-001;
-      p2 =         7.07454e+000;
-      p3 =        -1.75267e-001;
-      p4 =         2.08585e-003;
-      break;
-      case 2:
-      p0 =          3.42694e+000;
-      p1 =        -7.38052e-001;
-      p2 =         7.32696e+000;
-      p3 =        -2.14835e-001;
-      p4 =         2.98468e-003;
-      break;
-      case 3: 
-      p0 =         3.44122e+000;
-      p1 =        -7.32644e-001;
-      p2 =         6.68813e+000;
-      p3 =        -2.13227e-001;
-      p4 =         2.89048e-003;
-      break;
-      case 4: 
-      p0 =         3.44769e+000;
-      p1 =        -7.36780e-001;
-      p2 =         5.77368e+000;
-      p3 =        -2.06017e-001;
-      p4 =         2.72580e-003;
-      break;
-      case 5:
-      p0 =         3.45880e+000;
-      p1 =        -7.49052e-001;
-      p2 =         4.39402e+000;
-      p3 =        -2.16175e-001;
-      p4 =         2.65140e-003;
-      break;
-      }
-   }
-   else return corr;
-   
-   corr = exp(p0+p1*e) + p2 + p3*e +p4*e*e;
-   
-   return corr;
-
-}
