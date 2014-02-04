@@ -2,6 +2,8 @@
 
 float PFRecHitTimeCorr::tdcCorrHB(float rawTime, float rhE, int detDepth ) {
 
+  if (rhE > 40.0) rhE = 40.0;
+
   float p0 = 0.0;
   float p1 = 0.0;
   float p2 = 0.0;
@@ -32,11 +34,13 @@ float PFRecHitTimeCorr::tdcCorrHB(float rawTime, float rhE, int detDepth ) {
     break;
   }
     
-  return rawTime - exp(p0+p1*rhE) + p2 + p3*rhE +p4*rhE*rhE;
+  return rawTime - (exp(p0+p1*rhE) + p2 + p3*rhE +p4*rhE*rhE);
     
 }
 
 float PFRecHitTimeCorr::tdcCorrHE(float rawTime, float rhE, int detDepth ) {
+
+  if (rhE > 40.0) rhE = 40;
 
   float p0 = 0.0;
   float p1 = 0.0;
@@ -86,6 +90,6 @@ float PFRecHitTimeCorr::tdcCorrHE(float rawTime, float rhE, int detDepth ) {
     break;
   }
 
-  return rawTime - exp(p0+p1*rhE) + p2 + p3*rhE +p4*rhE*rhE;
+  return rawTime - (exp(p0+p1*rhE) + p2 + p3*rhE +p4*rhE*rhE);
 
 }
