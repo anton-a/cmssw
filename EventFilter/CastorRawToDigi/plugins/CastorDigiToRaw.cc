@@ -5,6 +5,7 @@
 #include "CalibFormats/CastorObjects/interface/CastorDbService.h"
 #include "CalibFormats/CastorObjects/interface/CastorDbRecord.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
+  
 #include <iostream>
 
 #include "EventFilter/CastorRawToDigi/interface/CastorCollections.h"
@@ -13,12 +14,12 @@
 using namespace std;
 
 CastorDigiToRaw::CastorDigiToRaw(edm::ParameterSet const& conf) :
-  castorTag_(conf.getUntrackedParameter("CASTOR",edm::InputTag())),
-  calibTag_(conf.getUntrackedParameter("CALIB",edm::InputTag())),
-  trigTag_(conf.getUntrackedParameter("TRIG",edm::InputTag())),
+  //calibTag_(conf.getUntrackedParameter("CALIB",edm::InputTag())),
+  //trigTag_(conf.getUntrackedParameter("TRIG",edm::InputTag())),
   usingctdc_(conf.getUntrackedParameter<bool>("CastorCtdc",false))
 
 {
+  castorTag_ = consumes<CastorDigiCollection>(conf.getParameter<edm::InputTag>("CASTOR"));
   produces<FEDRawDataCollection>();
 }
 
@@ -32,10 +33,15 @@ void CastorDigiToRaw::produce(edm::Event& e, const edm::EventSetup& es)
  
   // Step A: Get Inputs 
   edm::Handle<CastorDigiCollection> castor;
-  if (!castorTag_.label().empty()) {
-    e.getByLabel(castorTag_,castor);
-    colls.castorCont=castor.product();	
+  
+  e.getByToken(castorTag_,castor);
+
+  if(!castor.isValid()){
+    edm::LogError("CastorDigiToRaw") << " unable to digis from the event" << endl;
+    return;
   }
+  colls.castorCont=castor.product();	
+  
   // get the mapping
   edm::ESHandle<CastorDbService> pSetup;
   es.get<CastorDbRecord>().get( pSetup );
